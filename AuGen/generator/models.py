@@ -1,5 +1,5 @@
 from django.db import models
-from AuGen.user.models import CustomUser
+from user.models import CustomUser
 # Create your models here.
 
 class Generator(models.Model):
@@ -27,7 +27,7 @@ class Image(models.Model):
     gen = models.ForeignKey(Generator, on_delete=models.CASCADE, related_name='images')
     image_url = models.URLField()
     image = models.ImageField(upload_to='images', null=True, blank=True)
-    
+
     class Meta:
         """Meta definition for Image."""
 

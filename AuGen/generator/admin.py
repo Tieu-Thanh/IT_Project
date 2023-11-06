@@ -2,4 +2,5 @@ from django.contrib import admin
 from .models import Generator, Image
 # Register your models here.
 
-admin.site.register(Generator, Image)
+admin.site.register(Generator)
+admin.site.register(Image)
