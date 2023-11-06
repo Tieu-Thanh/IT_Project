@@ -1,11 +1,11 @@
 # IT_Project
 # Set up
-run on cmd: pip install -r requirements.txt
+run on cmd: pip install -r requirements.txt </br>
 so that you get all necessary libraries
 
 # Run apps
-Type:
-cd AuGen
-py manage.py makemigrations
-py manage.py migrate
+Type: </br>
+cd AuGen </br>
+py manage.py makemigrations </br>
+py manage.py migrate </br>
 py manage.py runserver
