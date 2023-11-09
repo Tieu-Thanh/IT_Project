@@ -1,5 +1,6 @@
 import os
 import time
+from typing import Self
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.support.ui import WebDriverWait
@@ -14,10 +15,16 @@ from django.core.files.base import ContentFile
 
 
 class Crawler:
+    __data = None
 
     def __init__(self):
         self.driver = self.__setupDriver()
 
+    def getData(self):
+        return self.__data
+    
+    def __setData(self, data):
+        self.__data = data
 
     def __setupDriver(self):
         
@@ -59,7 +66,8 @@ class Crawler:
                     response = requests.get(link)
                     if response.status_code == 200:
                         img_name = f"image_{idx}.jpg"
-                        images_dict[link] = ContentFile(response.content, img_name)
+                        # images_dict[link] = ContentFile(response.content, img_name)
+                        images_dict[img_name] = link
 
 
         except Exception as e:
@@ -72,7 +80,9 @@ class Crawler:
         return images_dict
     
     def crawl(self, query):
-        return self.__crawl(query)
+        data = self.__crawl(query)
+        self.__setData(data)
+
     
 
 
@@ -81,7 +91,6 @@ class Crawler:
 
 if __name__ == "__main__":
     crawler = Crawler()
-    foo = crawler.crawl("apple+fruit")
-    # print(type(foo))
-    for i in foo:
-        print(i, foo[i])
+    crawler.crawl("apple+banana+orange")
+    foo = crawler.getData()
+
