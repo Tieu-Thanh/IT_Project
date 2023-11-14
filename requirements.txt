@@ -3,3 +3,7 @@ webdriver_manager
 beautifulsoup4
 django
 Pillow
+djangorestframework
+django-allauth
+djangorestframework-simplejwt
+dj-rest-auth
