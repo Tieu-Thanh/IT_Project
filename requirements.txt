@@ -7,3 +7,7 @@ djangorestframework
 django-allauth
 djangorestframework-simplejwt
 dj-rest-auth
+google-cloud-firestore
+flask
+flask-restful
+firebase-admin

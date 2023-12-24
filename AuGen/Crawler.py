@@ -85,12 +85,10 @@ class Crawler:
 
     
 
-
-
-
-
 if __name__ == "__main__":
     crawler = Crawler()
     crawler.crawl("apple+banana+orange")
     foo = crawler.getData()
+    for i in foo:
+        print(i, foo[i])
 

@@ -1,4 +1,10 @@
-/myvenv
-/images
-/.vscode
+/myvenv/
+/images/
+/.vscode/
 /*.drawio
+/api/.venv/
+/api/.idea/
+/api/.env
+/api/*.json
+/api/__pycache__/
+*.pyc
