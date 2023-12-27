@@ -1,13 +1,10 @@
-selenium
+selenium~=4.15.2
 webdriver_manager
-beautifulsoup4
-django
+beautifulsoup4~=4.12.2
 Pillow
-djangorestframework
-django-allauth
-djangorestframework-simplejwt
-dj-rest-auth
 google-cloud-firestore
 flask
 flask-restful
 firebase-admin
+python-decouple
+requests
