@@ -5,6 +5,7 @@ from config import app_config
 from api.resources.auth_api import auth_bp
 from api.resources.user_api import user_bp
 from api.resources.model_api import model_bp
+from api.resources.image_api import image_bp
 import sys
 import os
 
@@ -17,6 +18,7 @@ app.config.from_object(app_config)
 app.register_blueprint(auth_bp, url_prefix='/api/auth')
 app.register_blueprint(user_bp, url_prefix='/api/user')
 app.register_blueprint(model_bp, url_prefix='/api/model')
+app.register_blueprint(image_bp, url_prefix='/api/model')
 
 
 @app.route('/')

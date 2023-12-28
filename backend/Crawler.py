@@ -23,7 +23,7 @@ class Crawler:
 
         return webdriver.Chrome(options=options)
 
-    def scroll_down_page(self, times=5):
+    def scroll_down_page(self, times=2):
         for _ in range(times):
             self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
             time.sleep(2)
