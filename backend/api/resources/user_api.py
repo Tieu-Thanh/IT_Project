@@ -33,4 +33,4 @@ class UserDetailResource(Resource):
             return {"error": str(e)}, 400
 
 
-api.add_resource(UserDetailResource, '/infor/<string:user_id>/', endpoint='user_detail')
+api.add_resource(UserDetailResource, '/info/<string:user_id>/', endpoint='user_detail')

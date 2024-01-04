@@ -44,7 +44,7 @@ class ImageDetailResource(Resource):
     def put(self, model_id, image_id):
         # Update the roi_value of a specific image
         data = request.get_json()
-        print(data)
+        # print(data)
 
         roi_values = data['roi_values']
         image_instance = Image.get_image_by_id(model_id, image_id)
@@ -68,7 +68,7 @@ class ImageDetailResource(Resource):
             return {'message': 'Image does not exist'}, 404
 
         # Delete the image from Firestore
-        image_instance.delete_from_firestore(model_id)
+        image_instance.delete_from_db(model_id)
         return {'message': 'Image deleted successfully'}, 201
 
 
