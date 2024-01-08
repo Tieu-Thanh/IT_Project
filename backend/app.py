@@ -16,6 +16,7 @@ app.register_blueprint(model_bp, url_prefix='/api/models')
 app.register_blueprint(image_bp, url_prefix='/api/models')
 
 
+
 @app.route('/')
 def hello_world():
     return 'Hello World!'
