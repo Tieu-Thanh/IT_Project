@@ -3,5 +3,6 @@
   <component name="Black">
     <option name="sdkName" value="Python 3.12 (IT_PROJECT)" />
   </component>
-  <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.12 (IT_PROJECT) (2)" project-jdk-type="Python SDK" />
+  <component name="ExternalStorageConfigurationManager" enabled="true" />
+  <component name="ProjectRootManager" version="2" project-jdk-name="jbr-17" project-jdk-type="JavaSDK" />
 </project>

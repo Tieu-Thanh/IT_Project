@@ -7,11 +7,11 @@ db = firestore.client()
 
 
 class Model:
-    def __init__(self, model_id, user_id, model_name):
+    def __init__(self, model_id, user_id, model_name, images):
         self.model_id = model_id
         self.user_id = user_id
         self.model_name = model_name
-        # self.images = []  # Store image IDs for efficient retrieval
+        self.images = images  # Store image IDs for efficient retrieval
 
     # def add_image(self, image_id):
     #     self.images.append(image_id)
