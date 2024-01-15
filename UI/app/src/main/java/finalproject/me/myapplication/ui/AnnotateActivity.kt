@@ -1,7 +1,8 @@
-package finalproject.me.myapplication
+package finalproject.me.myapplication.ui
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Canvas
@@ -25,6 +26,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
@@ -34,9 +36,12 @@ import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInRoot
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import finalproject.me.myapplication.R
 import finalproject.me.myapplication.ui.theme.MyApplicationTheme
 
 
@@ -57,6 +62,7 @@ class AnnotateActivity : ComponentActivity() {
             }
         }
     }
+    @OptIn(ExperimentalComposeUiApi::class)
     @SuppressLint("MutableCollectionMutableState", "SuspiciousIndentation",
         "UnrememberedMutableState"
     )
@@ -70,9 +76,11 @@ class AnnotateActivity : ComponentActivity() {
         var click = false
         var point1 = Offset(0f, 0f)
         var point2:Offset
+        var imagePosition = Offset(0f,0f)
         val rectangleList = remember {
             mutableStateListOf<Rectangle>()
         }
+        val boundingBoxes: List<BoundingBox>
         val clearRect = remember {
             mutableStateOf(false)
         }
@@ -80,7 +88,9 @@ class AnnotateActivity : ComponentActivity() {
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp)
+
                 .pointerInput(Unit) {
+
                     awaitEachGesture {
                         awaitFirstDown()
                         do {
@@ -92,13 +102,14 @@ class AnnotateActivity : ComponentActivity() {
                                 } else {
                                     point2 = event.changes.first().position
                                     rectangle.value = Rectangle(point1, point2)
+                                    Log.d(TAG, "bounding boxes: $point1, $point2")
+                                    Log.d(TAG,"position of the image${imagePosition}")
                                     if (event.type == PointerEventType.Release) {
                                         rectangleList.add(rectangle.value)
                                         click = false
-                                    }
-                                    else {
+                                    } else {
                                         rectangleList.add(rectangle.value)
-                                        rectangleList.removeAt(rectangleList.size-1)
+                                        rectangleList.removeAt(rectangleList.size - 1)
                                     }
                                 }
                             } else {
@@ -112,7 +123,8 @@ class AnnotateActivity : ComponentActivity() {
                                             rectangleList.remove(it)
                                         }
                                     if (rectangle.value.topLeft.x < event.changes.first().position.x && rectangle.value.topLeft.y < event.changes.first().position.y && rectangle.value.bottomRight.x > event.changes.first().position.x && rectangle.value.bottomRight.y > event.changes.first().position.y) {
-                                        rectangle.value = Rectangle(Offset(0f, 0f), Offset(0f, 0f))
+                                        rectangle.value =
+                                            Rectangle(Offset(0f, 0f), Offset(0f, 0f))
                                     }
                                 }
                             }
@@ -129,10 +141,14 @@ class AnnotateActivity : ComponentActivity() {
                     .fillMaxHeight(0.5f) // Displaying the image on half of the screen height
                     .clip(shape = MaterialTheme.shapes.medium) // Optional: Clip the image with a rounded shape
                     .align(Alignment.Center)
+                    .onGloballyPositioned {
+                        imagePosition = it.positionInRoot()
+
+                    }
             )
             Button(
                 onClick = {
-                          clearRect.value = false
+                    clearRect.value = false
                 },
                 modifier = Modifier.align(Alignment.BottomCenter)
             ) {
@@ -169,7 +185,8 @@ class AnnotateActivity : ComponentActivity() {
                 )
                 drawBoundingBoxes(
                     color = Color.Red,
-                    rectangles = rectangleList)
+                    rectangles = rectangleList
+                )
             }
         }
     }
@@ -187,6 +204,7 @@ class AnnotateActivity : ComponentActivity() {
             )
         )
     }
+
     private fun DrawScope.drawBoundingBoxes(
         color: Color,
         rectangles: List<Rectangle>
@@ -200,6 +218,10 @@ class AnnotateActivity : ComponentActivity() {
     }
 }
 
-
-
 data class Rectangle(val topLeft: Offset, val bottomRight: Offset)
+data class BoundingBox(var topLeft: Pair<Float,Float>, var bottomRight:Pair<Float,Float>,var imagePos:Offset){
+    fun rect2BoundingBox(rectangle:Rectangle){
+        this.topLeft = Pair(rectangle.topLeft.x - imagePos.x,rectangle.topLeft.y - imagePos.y)
+        this.bottomRight = Pair(rectangle.bottomRight.x-imagePos.x,rectangle.bottomRight.y-imagePos.y)
+    }
+}

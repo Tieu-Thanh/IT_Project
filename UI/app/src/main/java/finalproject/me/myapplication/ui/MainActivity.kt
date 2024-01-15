@@ -1,4 +1,4 @@
-package finalproject.me.myapplication
+package finalproject.me.myapplication.ui
 
 
 
@@ -32,6 +32,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import finalproject.me.myapplication.R
 import finalproject.me.myapplication.ui.theme.MyApplicationTheme
 
 class MainActivity : ComponentActivity() {
