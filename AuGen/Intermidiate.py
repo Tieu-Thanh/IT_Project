@@ -41,19 +41,21 @@ def read_images_from_folder(folder_path="Images"):
 
 
 if __name__ == "__main__":
+    os.chdir("..")
+    HOME = os.getcwd()
+    img_folder = os.path.join(HOME, "detection","Images")
     crawler = Crawler()
-    images_data = crawler.crawl("apple+banana+orange")
-
-    create_download_folder(download_folder="Images")
+    images_data = crawler.crawl("apple")
+    create_download_folder(download_folder=img_folder)
 
     for img in images_data:
         img_data = img.to_dict()
         url = img_data['url']
         image_id = img_data['image_id']
-        filename = f"{image_id}.jpg"  # You can change the file extension based on the actual image format
+        filename =  f"{image_id}.jpg"  # You can change the file extension based on the actual image format
 
-        download_image(url, filename)
+        download_image(url, filename, download_folder=img_folder)
 
-    images = read_images_from_folder("Images")
+    images = read_images_from_folder(img_folder)
     for i, img in enumerate(images):
         print(f"Image {i + 1} shape: {img.shape}")
