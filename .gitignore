@@ -1,4 +1,6 @@
-/myvenv
-/images
-/.vscode
-/*.drawio
+/myvenv/
+/images/
+/.vscode/
+/UML
+/backend/.idea
+/api/*.json
