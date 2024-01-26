@@ -4,3 +4,6 @@
 /UML
 /backend/.idea
 /api/*.json
+/env*
+/detection/data
+/detection/__pycache__
