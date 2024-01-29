@@ -17,3 +17,16 @@ val GrayColor = Color(0xFF7B6F72)
 val WhiteColor = Color(0xFFFFFFFF)
 val BgColor = Color(0xFFF7F8F8)
 val TextColor1 = Color(0xFF7d32a8)
+
+val PurpleStart = Color(0xFFD24BE9)
+val PurpleEnd = Color(0xFFDF8FEC)
+val Milk = Color(0xFFFDFFF5)
+
+val PurpleSpecStart = Color(0xFF9D50BB)
+val PurpleSpecEnd = Color(0xFF6E48AA)
+
+val DarkSpecStart = Color(0xFF232526)
+val DarkSpecEnd = Color(0xFF414345)
+
+val JaipurStart = Color(0xFF9796f0)
+val JaipurEnd = Color(0xFFfbc7d4)

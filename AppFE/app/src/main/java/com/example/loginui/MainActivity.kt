@@ -20,8 +20,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavHostController
 
 import androidx.navigation.compose.rememberNavController
+import com.example.loginui.Screen.AnimatedSplash
+import com.example.loginui.Screen.SignIn
+import com.example.loginui.Screen.Splash
 
 import com.example.loginui.navigation.SetupNavGraph
 
@@ -38,12 +42,18 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
+
+
+
+
                     val navController = rememberNavController()
 
 
                     SetupNavGraph(navController = navController)
 
-                    Login()
+
+
+
                 }
             }
         }
