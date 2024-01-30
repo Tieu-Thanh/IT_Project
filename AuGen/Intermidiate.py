@@ -24,7 +24,6 @@ def download_image(url, filename, download_folder="Images"):
     else:
         print(f"Failed to download: {filename}")
 
-
 def read_images_from_folder(folder_path="Images"):
     images = []
     for filename in os.listdir(folder_path):

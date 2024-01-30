@@ -86,7 +86,6 @@ if __name__ == "__main__":
     # for img in images_data:
     #     print(img.to_dict())
 
-
     queries = ["hawk", "tiger", "grass hopper"]
     crawler = Crawler()
     images_data = crawler.multi_crawl(queries, 10)
