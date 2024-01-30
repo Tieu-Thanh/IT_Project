@@ -44,14 +44,17 @@ if __name__ == "__main__":
     os.chdir("..")
     HOME = os.getcwd()
     img_folder = os.path.join(HOME, "detection","Images")
+
+    queries = ["hawk", "tiger", "grass hopper"]
     crawler = Crawler()
-    images_data = crawler.crawl("apple")
+    images_data = crawler.multi_crawl(queries, 10)
+
     create_download_folder(download_folder=img_folder)
 
     for img in images_data:
         img_data = img.to_dict()
         url = img_data['url']
-        image_id = img_data['image_id']
+        image_id = f"{img_data['query']}_{img_data['image_id']}"
         filename =  f"{image_id}.jpg"  # You can change the file extension based on the actual image format
 
         download_image(url, filename, download_folder=img_folder)
