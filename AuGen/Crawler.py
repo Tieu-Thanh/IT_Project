@@ -1,9 +1,10 @@
 import time
+import os
 import requests
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
-
+from concurrent.futures import ThreadPoolExecutor
 # from api.models.Image import Image
 from Image import Image
 
@@ -23,32 +24,37 @@ class Crawler:
 
         return webdriver.Chrome(options=options)
 
-    def scroll_down_page(self, times=2):
+    def __scroll_down_page(self, times=2):
         for _ in range(times):
             self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
             time.sleep(2)
 
-    def crawl_images(self, query):
+    def __crawl_images(self, query, img_num=50, scroll_times=1):
         images_list = []
         try:
-            search_url = f'https://www.google.com/search?q={query}&tbm=isch'
+            search_url = f'https://www.google.com/search?q={query.replace(" ", "+")}&tbm=isch'
             self.driver.get(search_url)
             time.sleep(5)
 
-            self.scroll_down_page()
+            self.__scroll_down_page(times=scroll_times)
 
             soup = BeautifulSoup(self.driver.page_source, 'html.parser')
 
             image_container = soup.find(id='islrg')
 
-            for idx, raw_img in enumerate(image_container.find_all('img'), 1):
+            idx = 1
+            for raw_img in image_container.find_all('img'):
+                if idx > img_num:
+                    break
+
                 link = raw_img.get('data-src')
                 if link and link.startswith("https://") and "images" in link:
-                    img_id = f"image_{idx}"
-                    roi_values = []  # You may want to extract ROI values from the page
+                    img_id = f"{idx}"
 
-                    image = Image(img_id, link, roi_values)
+                    image = Image(image_id=img_id, query=query.replace(" ", "_"), url=link)
                     images_list.append(image)
+
+                    idx += 1
 
         except Exception as e:
             print(f"An error occurred during crawling: {e}")
@@ -57,11 +63,52 @@ class Crawler:
 
     def crawl(self, query):
         with self.driver:
-            return self.crawl_images(query)
+            return self.__crawl_images(query)
 
+    def multi_crawl(self, queries, img_num=50):
+        img_list = []
+        with ThreadPoolExecutor() as executor:
+            for query in queries:
+                result = list(executor.map(self.__crawl_images, [query], [img_num]))
+                img_list.extend(result[0])
+        return img_list
+
+    def create_download_folder(self, folder_name="Images"):
+        if not os.path.exists(folder_name):
+            os.makedirs(folder_name)
+
+    def download_images(self, images, download_folder="Images"):
+        self.create_download_folder(download_folder)
+
+        for img in images:
+            folder_path = os.path.join(download_folder, img.query)
+            self.create_download_folder(folder_path)
+
+            filename = f"{img.query}_{img.image_id}.jpg"
+            filepath = os.path.join(folder_path, filename)
+
+            response = requests.get(img.url)
+            if response.status_code == 200:
+                with open(filepath, 'wb') as file:
+                    file.write(response.content)
+                print(f"Downloaded: {filename}")
+            else:
+                print(f"Failed to download: {filename}")
 
 if __name__ == "__main__":
+    # crawler = Crawler()
+    # images_data = crawler.crawl("apple+banana+orange")
+    # for img in images_data:
+    #     print(img.to_dict())
+    #
+    # queries = ["hawk", "tiger", "grass hopper"]
+    # crawler = Crawler()
+    # images_data = crawler.multi_crawl(queries, 10)
+    # for img in images_data:
+    #     print(img.to_dict())
+
+    queries = ["hawk", "tiger", "grass hopper"]
     crawler = Crawler()
-    images_data = crawler.crawl("apple+banana+orange")
-    for img in images_data:
-        print(img.to_dict())
+    images_data = crawler.multi_crawl(queries, img_num=5)
+
+    crawler.download_images(images_data)
