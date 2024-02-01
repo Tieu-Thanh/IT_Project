@@ -1,5 +1,5 @@
 class Image:
-    def __init__(self, image_id, url, query=None):
+    def __init__(self, image_id, url, query):
         self.image_id = image_id
         self.url = url
         # self.roi_values = roi_values
