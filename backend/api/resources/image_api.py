@@ -1,16 +1,16 @@
 # List Images for a Model:
-# Endpoint: /api/model/<model_id>/images
+# Endpoint: /api/model/<obj_id>/images
 # Method: GET
 # Description: Retrieve a list of images associated with a specific model.
 from email import parser
 
 # Get Details of a Specific Image:
-# Endpoint: /api/model/<model_id>/images/<image_id>
+# Endpoint: /api/model/<obj_id>/images/<image_id>
 # Method: GET
 # Description: Retrieve details of a specific image within a model.
 
 # Delete an Image from a Model:
-# Endpoint: /api/model/<model_id>/images/<image_id>
+# Endpoint: /api/model/<obj_id>/images/<image_id>
 # Method: DELETE
 # Description: Delete a specific image from a model.
 
@@ -73,5 +73,5 @@ class ImageDetailResource(Resource):
 
 
 # Define the API endpoints
-api.add_resource(ImageListResource, '/<model_id>/images', endpoint='image_list')
-api.add_resource(ImageDetailResource, '/<model_id>/images/<image_id>', endpoint='image_detail')
+api.add_resource(ImageListResource, '/<obj_id>/images', endpoint='image_list')
+api.add_resource(ImageDetailResource, '/<obj_id>/images/<image_id>', endpoint='image_detail')

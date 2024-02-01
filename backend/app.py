@@ -2,7 +2,7 @@ from flask import Flask
 from config import app_config
 from api.resources.auth_api import auth_bp
 from api.resources.user_api import user_bp
-from api.resources.model_api import model_bp
+from api.resources.obj_api import object_bp
 from api.resources.image_api import image_bp
 
 
@@ -12,8 +12,8 @@ app.config.from_object(app_config)
 # Blueprint registration
 app.register_blueprint(auth_bp, url_prefix='/api/auth')
 app.register_blueprint(user_bp, url_prefix='/api/users')
-app.register_blueprint(model_bp, url_prefix='/api/models')
-app.register_blueprint(image_bp, url_prefix='/api/models')
+app.register_blueprint(object_bp, url_prefix='/api/objects')
+app.register_blueprint(image_bp, url_prefix='/api/objects')
 
 
 
