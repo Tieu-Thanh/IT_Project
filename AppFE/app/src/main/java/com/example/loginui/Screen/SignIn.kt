@@ -1,6 +1,7 @@
 package com.example.loginui.Screen
 
 
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -201,6 +202,7 @@ fun SignIn(navController: NavHostController) {
                             Toast.makeText(context, "Login Success", Toast.LENGTH_LONG).show()
                             user = email
                             navController.navigate("HomeScreen")
+                            Log.d("11111111111111", "onResponse: $user")
                         } else {
                             Toast.makeText(context, "Login Failed", Toast.LENGTH_LONG).show()
 
