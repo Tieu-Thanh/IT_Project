@@ -305,8 +305,9 @@ fun HomeScreen(navController: NavHostController) {
             }
 
         }
-        MidScreen(navController)
         FunctionSection(navController)
+
+
 
     }
 }

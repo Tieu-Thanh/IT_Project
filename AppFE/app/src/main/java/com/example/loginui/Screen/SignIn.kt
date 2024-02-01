@@ -49,11 +49,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 import androidx.navigation.NavHostController
+import androidx.navigation.Navigation
+import androidx.navigation.Navigator
 import com.example.loginui.API.RetrofitClient
 import com.example.loginui.R
 import com.example.loginui.data.Destionations
 import com.example.loginui.data.SignInRequest
 import com.example.loginui.data.SignInResponse
+import com.example.loginui.navigation.user
 import com.example.loginui.ui.theme.TextColor1
 import com.example.loginui.ui.theme.WhiteColor
 import com.example.loginui.ui.theme.interFontFamily
@@ -91,8 +94,8 @@ fun SignIn(navController: NavHostController) {
             fontWeight = FontWeight.Bold,
             color = TextColor1,
         )
-        var email by remember { mutableStateOf("") }
-        var password by remember { mutableStateOf("") }
+        var email by remember { mutableStateOf("test.user@gmail.com") }
+        var password by remember { mutableStateOf("123456") }
         var passwordVisible by rememberSaveable() { mutableStateOf(false) }
         val context = LocalContext.current
 
@@ -183,30 +186,31 @@ fun SignIn(navController: NavHostController) {
         )
         Button(
             onClick = {
-//
-//
-//                val signInRequest = SignInRequest(email, password)
-//
-//                val signInResponseCall: Call<SignInResponse> =
-//                    RetrofitClient().authService.userLogin(signInRequest)
-//                signInResponseCall.enqueue(object : Callback<SignInResponse> {
-//                    override fun onResponse(
-//                        call: Call<SignInResponse>,
-//                        response: Response<SignInResponse>
-//                    ) {
-//                        if (response.isSuccessful) {
-//                            Toast.makeText(context, "Login Success", Toast.LENGTH_LONG).show()
+
+
+                val signInRequest = SignInRequest(email, password)
+
+                val signInResponseCall: Call<SignInResponse> =
+                    RetrofitClient().authService.userLogin(signInRequest)
+                signInResponseCall.enqueue(object : Callback<SignInResponse> {
+                    override fun onResponse(
+                        call: Call<SignInResponse>,
+                        response: Response<SignInResponse>
+                    ) {
+                        if (response.isSuccessful) {
+                            Toast.makeText(context, "Login Success", Toast.LENGTH_LONG).show()
+                            user = email
                             navController.navigate("HomeScreen")
-//                        } else {
-//                            Toast.makeText(context, "Login Failed", Toast.LENGTH_LONG).show()
-//
-//                        }
-//                    }
-//
-//                    override fun onFailure(call: Call<SignInResponse>, t: Throwable) {
-//                        Toast.makeText(context, "Login Fuck", Toast.LENGTH_LONG).show()
-//                    }
-//                })
+                        } else {
+                            Toast.makeText(context, "Login Failed", Toast.LENGTH_LONG).show()
+
+                        }
+                    }
+
+                    override fun onFailure(call: Call<SignInResponse>, t: Throwable) {
+                        Toast.makeText(context, "Login Fuck", Toast.LENGTH_LONG).show()
+                    }
+                })
 
 
             }, Modifier

@@ -11,6 +11,7 @@ import com.example.loginui.Screen.AnimatedSplash
 import com.example.loginui.Screen.Favorites
 
 import com.example.loginui.Screen.HomeScreen
+import com.example.loginui.Screen.ListObject
 import com.example.loginui.Screen.Setting
 import com.example.loginui.Screen.SignIn
 import com.example.loginui.Screen.SignUp
@@ -19,6 +20,7 @@ import com.example.loginui.SubScreen.Contact_us
 import com.example.loginui.SubScreen.News
 import com.example.loginui.data.Destionations
 
+var user: String = ""
 @Composable
 fun SetupNavGraph(navController: NavHostController) {
     NavHost(
@@ -54,6 +56,9 @@ fun SetupNavGraph(navController: NavHostController) {
         }
         composable("DM_function") {
             DM_function(navController = navController)
+        }
+        composable("ListObject"){
+            ListObject(navController = navController)
         }
     }
 }

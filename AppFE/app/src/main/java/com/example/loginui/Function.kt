@@ -59,7 +59,6 @@ val func_items = listOf(
     FuncItem(
         title = "Distance measurement",
         description = "This solution will show you the approximately of distance",
-
         ),
     FuncItem(
         title = "Distance measurement",
@@ -88,7 +87,6 @@ val func_items = listOf(
 @Composable
 fun FunctionSection(navController: NavHostController) {
     LazyColumn {
-
         items(func_items.size) { index ->
             FuncInfo(index, navController)
             Spacer(modifier = Modifier.height(10.dp))
@@ -125,7 +123,7 @@ fun FuncInfo(
                 .fillMaxHeight()
                 .clickable {
                     if (func.title == "Count object") {
-                        navController.navigate("C0_function")
+                        navController.navigate("ListObject")
                     } else if (func.title == "Distance measurement") {
                         navController.navigate("DM_function")
                     }
@@ -173,7 +171,6 @@ fun FuncInfo(
                         fontWeight = FontWeight.Normal
                     )
                 }
-
 
             }
 
