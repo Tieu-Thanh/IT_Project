@@ -42,12 +42,12 @@ import com.example.loginui.data.Destionations
 import com.example.loginui.data.items
 
 
+
 @Composable
 fun BottomNavigationBar(bottomNavController: NavHostController) {
 
     val selected = rememberSaveable {
         mutableIntStateOf(0)
-
     }
 
     NavigationBar {

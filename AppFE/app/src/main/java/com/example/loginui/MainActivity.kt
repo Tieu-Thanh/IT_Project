@@ -16,6 +16,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 
 import androidx.compose.ui.Modifier
 
@@ -33,6 +37,7 @@ import com.example.loginui.ui.theme.LoginUITheme
 
 
 class MainActivity : ComponentActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -42,24 +47,13 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-
-
-
-
                     val navController = rememberNavController()
-
-
                     SetupNavGraph(navController = navController)
-
-
-
-
                 }
             }
         }
     }
-
-    @OptIn(ExperimentalMaterial3Api::class)
+    
     @Preview
     @Composable
     fun Login() {
