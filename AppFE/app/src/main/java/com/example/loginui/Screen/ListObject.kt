@@ -2,6 +2,7 @@ package com.example.loginui.Screen
 
 import android.annotation.SuppressLint
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -111,7 +112,13 @@ fun ButtonAtScreenBottom(navController: NavHostController) {
         .padding(16.dp)) {
 
         Button(
-            onClick = { navController.navigate("ModelInfo")},
+            onClick = {
+                if (itemList.isNotEmpty()) {
+                          navController.navigate("ModelInfo")
+                      } else {
+                          Toast.makeText(null, "Please enter at least one class", Toast.LENGTH_SHORT).show()
+                      }
+                  },
             modifier = Modifier.align(Alignment.BottomEnd)
         ) {
             Text("Next")
