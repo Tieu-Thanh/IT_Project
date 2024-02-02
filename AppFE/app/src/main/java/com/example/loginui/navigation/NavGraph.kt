@@ -12,6 +12,7 @@ import com.example.loginui.Screen.Favorites
 
 import com.example.loginui.Screen.HomeScreen
 import com.example.loginui.Screen.ListObject
+import com.example.loginui.Screen.ModelInfo
 import com.example.loginui.Screen.Setting
 import com.example.loginui.Screen.SignIn
 import com.example.loginui.Screen.SignUp
@@ -59,6 +60,9 @@ fun SetupNavGraph(navController: NavHostController) {
         }
         composable("ListObject"){
             ListObject(navController = navController)
+        }
+        composable("ModelInfo"){
+            ModelInfo()
         }
     }
 }

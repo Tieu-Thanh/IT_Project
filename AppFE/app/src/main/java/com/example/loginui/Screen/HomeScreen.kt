@@ -69,7 +69,6 @@ import com.example.loginui.ui.theme.interFontFamily
 
 @Composable
 fun HomeScreen(navController: NavHostController) {
-    val bottomNavController = rememberNavController()
     Scaffold(
         bottomBar = {
 
@@ -306,8 +305,6 @@ fun HomeScreen(navController: NavHostController) {
 
         }
         FunctionSection(navController)
-
-
 
     }
 }
