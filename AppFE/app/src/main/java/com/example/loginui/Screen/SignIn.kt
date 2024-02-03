@@ -48,20 +48,15 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
 import androidx.navigation.NavHostController
-import androidx.navigation.Navigation
-import androidx.navigation.Navigator
 import com.example.loginui.API.RetrofitClient
 import com.example.loginui.R
-import com.example.loginui.data.Destionations
 import com.example.loginui.data.SignInRequest
 import com.example.loginui.data.SignInResponse
 import com.example.loginui.navigation.user
 import com.example.loginui.ui.theme.TextColor1
 import com.example.loginui.ui.theme.WhiteColor
 import com.example.loginui.ui.theme.interFontFamily
-
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -143,7 +138,6 @@ fun SignIn(navController: NavHostController) {
                 .height(76.dp)
                 .padding(start = 64.dp, end = 64.dp, top = 8.dp, bottom = 8.dp),
 
-
             shape = RoundedCornerShape(50),
             textStyle = TextStyle(
 
@@ -187,8 +181,6 @@ fun SignIn(navController: NavHostController) {
         )
         Button(
             onClick = {
-
-
                 val signInRequest = SignInRequest(email, password)
 
                 val signInResponseCall: Call<SignInResponse> =
@@ -223,14 +215,12 @@ fun SignIn(navController: NavHostController) {
             shape = RoundedCornerShape(50)
 
         ) {
-
             Text(
                 text = "Sign In",
                 fontFamily = interFontFamily,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
             )
-
         }
         Row {
 

@@ -6,20 +6,16 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.loginui.FunctionDetail.Co_function
 import com.example.loginui.FunctionDetail.DM_function
-import com.example.loginui.Screen.Account
 import com.example.loginui.Screen.AnimatedSplash
-import com.example.loginui.Screen.Favorites
 
 import com.example.loginui.Screen.HomeScreen
 import com.example.loginui.Screen.ListObject
 import com.example.loginui.Screen.ModelInfo
-import com.example.loginui.Screen.Setting
 import com.example.loginui.Screen.SignIn
 import com.example.loginui.Screen.SignUp
 import com.example.loginui.SubScreen.About_us
 import com.example.loginui.SubScreen.Contact_us
 import com.example.loginui.SubScreen.News
-import com.example.loginui.data.Destionations
 
 var user: String = ""
 @Composable

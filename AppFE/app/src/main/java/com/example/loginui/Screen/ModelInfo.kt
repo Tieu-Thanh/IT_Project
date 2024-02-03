@@ -2,9 +2,7 @@ package com.example.loginui.Screen
 
 import android.annotation.SuppressLint
 import android.graphics.Bitmap
-import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
@@ -103,7 +101,7 @@ fun ModelInfo(){
         }
         Button(
             onClick = { //TODO: Start training model
-                 },
+                },
             modifier = Modifier
                 .align(Alignment.CenterHorizontally)
                 .padding(16.dp)
@@ -114,7 +112,7 @@ fun ModelInfo(){
 }
 
 fun uploadFunction(){
-    // upload function
+
 }
 
 @Composable
