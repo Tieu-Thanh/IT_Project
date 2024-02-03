@@ -21,49 +21,27 @@ import androidx.compose.material.icons.rounded.Groups2
 import androidx.compose.material.icons.rounded.Mail
 import androidx.compose.material.icons.rounded.Memory
 import androidx.compose.material.icons.rounded.Newspaper
-import androidx.compose.material3.CardDefaults.shape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.navigation.NavController
-import androidx.navigation.NavHost
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import com.example.loginui.FunctionSection
-import com.example.loginui.Section.SearchBarSection
-import com.example.loginui.Section.TopBarSection
-import com.example.loginui.navigation.BottomNavigationBar
-import com.example.loginui.navigation.MidScreen
-import com.example.loginui.navigation.SetupNavGraph
-import com.example.loginui.ui.theme.DarkSpecEnd
 import com.example.loginui.ui.theme.DarkSpecStart
-
 import com.example.loginui.ui.theme.Milk
 import com.example.loginui.ui.theme.PurpleEnd
 import com.example.loginui.ui.theme.PurpleSpecEnd
 import com.example.loginui.ui.theme.PurpleSpecStart
 import com.example.loginui.ui.theme.PurpleStart
-import com.example.loginui.ui.theme.TextColor1
 import com.example.loginui.ui.theme.interFontFamily
 
 
