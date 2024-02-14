@@ -6,8 +6,7 @@ from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
 from concurrent.futures import ThreadPoolExecutor
 # from api.models.Image import Image
-from backend.Image import Image
-
+from Image import Image
 
 class Crawler:
     def __init__(self):
@@ -62,6 +61,7 @@ class Crawler:
 
         return images_list
 
+
     def crawl(self, queries, img_num=50):
         img_list = []
         with ThreadPoolExecutor(max_workers=3) as executor:
@@ -92,8 +92,8 @@ class Crawler:
             else:
                 print(f"Failed to download: {filename}")
 
-
 if __name__ == "__main__":
+
     # Crawl images
     queries = ["hawk", "tiger", "grass hopper"]
     crawler = Crawler()
