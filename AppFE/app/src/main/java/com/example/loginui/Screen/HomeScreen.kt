@@ -52,8 +52,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.loginui.FunctionSection
 import com.example.loginui.Section.SearchBarSection
 import com.example.loginui.Section.TopBarSection
-import com.example.loginui.navigation.BottomNavigationBar
-import com.example.loginui.navigation.MidScreen
+
 import com.example.loginui.navigation.SetupNavGraph
 import com.example.loginui.ui.theme.DarkSpecEnd
 import com.example.loginui.ui.theme.DarkSpecStart

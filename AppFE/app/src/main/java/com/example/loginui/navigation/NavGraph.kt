@@ -33,9 +33,7 @@ fun SetupNavGraph(navController: NavHostController) {
         composable("SignUp") {
             SignUp(navController = navController)
         }
-        composable("Mid_Screen") {
-            MidScreen(navController = navController)
-        }
+
         composable("News") {
             News(navController = navController)
         }
@@ -58,7 +56,7 @@ fun SetupNavGraph(navController: NavHostController) {
             ListObject(navController = navController)
         }
         composable("ModelInfo"){
-            ModelInfo()
+            ModelInfo(navController = navController)
         }
     }
 }
