@@ -55,9 +55,9 @@ fun SetupNavGraph(navController: NavHostController) {
         composable("ListObject"){
             ListObject(navController = navController)
         }
-//        composable("ModelInfo"){
-//            ModelInfo(navController = navController)
-//        }
+        composable("ModelInfo"){
+            ModelInfo(navController = navController)
+        }
     }
 }
 

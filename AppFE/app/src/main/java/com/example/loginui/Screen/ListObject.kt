@@ -55,12 +55,11 @@ import com.example.loginui.ui.theme.interFontFamily
 
 val itemList = mutableStateListOf<String>()
 
-@Preview
 @SuppressLint("UnrememberedMutableState")
 @Composable
 fun ListObject(navController: NavHostController) {
     Column {
-        TopBackground()
+        TopBackground(navController)
         TextField()
         ListObjectDisplay()
         ButtonAtScreenBottom(navController)
@@ -69,12 +68,12 @@ fun ListObject(navController: NavHostController) {
 
 
 @Composable
-fun TopBackground() {
+fun TopBackground(navController: NavHostController) {
     Row(
         modifier = Modifier.padding(top = 16.dp)
     ) {
         IconButton(onClick = {
-//            navController.navigate("HomeScreen")
+            navController.navigate("HomeScreen")
         }) {
             Icon(
                 imageVector = Icons.Rounded.ArrowBack,
