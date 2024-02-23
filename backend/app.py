@@ -1,12 +1,26 @@
 from flask import Flask
-from config import app_config
-from blueprints.api import api_blueprint
+import firebase_admin
+from firebase_admin import credentials, firestore, storage
+
+from blueprints.api.views.model_api import model_api_bp
 
 app = Flask(__name__)
-app.config.from_object(app_config)
 
-# Register the API blueprint
-app.register_blueprint(api_blueprint, url_prefix='/api')
+# Initialize Firebase Admin
+cred = credentials.Certificate('key.json')
+firebase_admin.initialize_app(cred, {
+    'storageBucket': 'chuyen-de-nghien-cuu.appspot.com'
+})
+
+# Firestore database client
+db = firestore.client()
+
+# Storage bucket
+bucket = storage.bucket()
+
+
+# Register blueprint
+app.register_blueprint(model_api_bp, url_prefix='/api/models')
 
 
 @app.route('/')

@@ -6,7 +6,7 @@ from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
 from concurrent.futures import ThreadPoolExecutor
 # from api.models.Image import Image
-from backend.Image import Image
+from .Image import Image
 
 
 class Crawler:
@@ -98,9 +98,10 @@ if __name__ == "__main__":
     queries = ["hawk", "tiger", "grass hopper"]
     crawler = Crawler()
     images_data = crawler.crawl(queries, img_num=5)
-
+    print(images_data)
     # Download images
-    os.chdir("..")
-    HOME = os.getcwd()
-    img_folder = os.path.join(HOME, "detection", "Images")
-    crawler.download_images(images_data, download_folder=img_folder)
+    # os.chdir("../../../..")
+    # HOME = os.getcwd()
+    # img_folder = os.path.join(HOME, "detection", "Images")
+    # # print(img_folder)
+    # crawler.download_images(images_data, download_folder=img_folder)

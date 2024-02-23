@@ -28,6 +28,7 @@ class Config:
     FIREBASE_MEASUREMENT_ID = env_config('FIREBASE_MEASUREMENT_ID', default='G-4ZYD9VVTQS')
 
 
+
 class DevelopmentConfig(Config):
     DEBUG = True
     # Add development-specific configurations if needed
