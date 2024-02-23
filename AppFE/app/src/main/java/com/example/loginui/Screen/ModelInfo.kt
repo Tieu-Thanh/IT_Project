@@ -8,10 +8,14 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -21,6 +25,7 @@ import androidx.compose.material.icons.filled.Camera
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Camera
 import androidx.compose.material.icons.rounded.Check
+import androidx.compose.material.icons.rounded.Circle
 import androidx.compose.material.icons.rounded.DeveloperMode
 import androidx.compose.material.icons.rounded.Mail
 import androidx.compose.material.icons.rounded.ModelTraining
@@ -64,7 +69,7 @@ val TAG = "ModelInfo"
 @Preview
 @SuppressLint("MutableCollectionMutableState")
 @Composable
-fun ModelInfo(navController: NavHostController) {
+fun ModelInfo() {
     var loading by remember {
         mutableStateOf(false)
     }
@@ -79,76 +84,120 @@ fun ModelInfo(navController: NavHostController) {
             imageBitmap = bitmap
         }
     )
+
     Column {
-        TopBackground(navController)
+        TopBackground()
         Row(
-            modifier = Modifier.padding(start = 8.dp)
+            modifier = Modifier.padding(start = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
         ) {
             Icon(
-                imageVector = Icons.Rounded.ModelTraining,
+                imageVector = Icons.Rounded.Circle,
                 contentDescription = "Model Info",
-                tint = DarkSpecEnd
+                tint = TextColor1,
+                modifier = Modifier
+                    .size(15.dp)
+                    .padding(start = 5.dp)
+
             )
             Text(
                 text = "Model Info",
-                color = DarkSpecEnd,
+                color = Color.Black,
                 fontWeight = FontWeight.Bold,
-                fontSize = 20.sp,
+                fontSize = 25.sp,
                 modifier = Modifier.padding(start = 8.dp)
             )
         }
-        Row(
-            modifier = Modifier.padding(start = 8.dp, top = 3.dp)
+        Box(
+            modifier = Modifier
+                .padding(start = 8.dp, top = 5.dp, end = 10.dp)
+                .fillMaxWidth()
+                .border(
+                    width = 2.dp,
+                    color = Color.Black,
+                    shape = MaterialTheme.shapes.medium
+                )
+
         ) {
-            Icon(
-                imageVector = Icons.Rounded.Mail,
-                contentDescription = "Model Info",
-                tint = DarkSpecEnd
-            )
-            Text(
-                text = "Email: $user",
-                modifier = Modifier.padding(top = 2.dp, start = 8.dp),
-                fontSize = 15.sp
-            )
-        }
-        Row(
-            modifier = Modifier.padding(start = 8.dp, top = 4.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Rounded.DeveloperMode,
-                contentDescription = "Model Info",
-                tint = DarkSpecEnd
-            )
-            Text(
-                text = "Model: Yolov8",
-                modifier = Modifier.padding(top = 1.dp, start = 8.dp),
-                fontSize = 15.sp
-            )
-        }
-        Row(
-            modifier = Modifier.padding(start = 8.dp, top = 3.dp)
-        ) {
-            Icon(
-                imageVector = Icons.Rounded.Check,
-                contentDescription = "Model Info",
-                tint = DarkSpecEnd
-            )
-            Text(
-                text = "Accuracy: ...",
-                modifier = Modifier.padding(top = 1.dp, start = 8.dp),
-                fontSize = 15.sp
-            )
+            Column {
+
+                Row(
+                    modifier = Modifier.padding(start = 8.dp, top = 3.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Mail,
+                        contentDescription = "Model Info",
+                        tint = DarkSpecEnd,
+                        modifier = Modifier.padding(top = 2.dp)
+                    )
+                    Text(
+                        text = "Email: $user",
+                        modifier = Modifier.padding(top = 2.dp, start = 8.dp),
+                        color = DarkSpecEnd,
+                        fontSize = 20.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+                Row(
+                    modifier = Modifier.padding(start = 8.dp, top = 4.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.DeveloperMode,
+                        contentDescription = "Model Info",
+                        tint = DarkSpecEnd,
+                        modifier = Modifier.padding(top = 2.dp)
+                    )
+                    Text(
+                        text = "Model: Yolov8",
+                        modifier = Modifier.padding(top = 1.dp, start = 8.dp),
+                        fontSize = 20.sp,
+                        color = DarkSpecEnd,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+                Row(
+                    modifier = Modifier.padding(start = 8.dp, top = 3.dp)
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Check,
+                        contentDescription = "Model Info",
+                        tint = DarkSpecEnd,
+                        modifier = Modifier.padding(top = 2.dp)
+                    )
+                    Text(
+                        text = "Accuracy: ...",
+                        modifier = Modifier.padding(top = 1.dp, start = 8.dp, bottom = 4.dp),
+                        fontSize = 20.sp,
+                        color = DarkSpecEnd,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+
+            }
         }
 
 
 
+
         Row(
-            modifier = Modifier.padding(start = 10.dp)
+            modifier = Modifier.padding(start = 8.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center
         ) {
+            Icon(
+                imageVector = Icons.Rounded.Circle,
+                contentDescription = "Important",
+                tint = TextColor1,
+                modifier = Modifier
+                    .size(15.dp)
+                    .padding(start = 5.dp)
+            )
             Text(
                 text = "Training place",
-                modifier = Modifier.padding(top = 10.dp, end = 150.dp),
-                fontSize = 20.sp,
+                modifier = Modifier.padding(start = 5.dp, top = 2.dp, end = 120.dp),
+                color = Color.Black,
+                fontSize = 25.sp,
                 fontWeight = FontWeight.Bold
             )
             Button(
@@ -172,18 +221,31 @@ fun ModelInfo(navController: NavHostController) {
             bitmapList.add(imageBitmap)
             imageBitmap = null
         }
-        Row(modifier = Modifier.size(200.dp)) {
-            bitmapList.forEach {
-                it?.asImageBitmap()?.let { bitmap ->
-                    Image(bitmap = bitmap, contentDescription = "Image")
+        Box(
+            modifier = Modifier
+                .padding(start = 8.dp, top = 8.dp, end = 10.dp)
+                .fillMaxWidth()
+                .border(
+                    width = 2.dp,
+                    color = Color.Black,
+                    shape = MaterialTheme.shapes.medium
+                )
+        ) {
+            Row(modifier = Modifier.size(200.dp)) {
+                bitmapList.forEach {
+                    it?.asImageBitmap()?.let { bitmap ->
+                        Image(bitmap = bitmap, contentDescription = "Image")
+                    }
                 }
             }
         }
+
         Button(
             onClick = {
                 loading = true
             }, modifier = Modifier
-                .align(Alignment.CenterHorizontally),
+                .align(Alignment.CenterHorizontally)
+                .padding(top = 5.dp),
             colors = ButtonDefaults.buttonColors(TextColor1)
         ) {
             Text(text = "Upload")
@@ -193,7 +255,7 @@ fun ModelInfo(navController: NavHostController) {
             color = Color.Black,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(10.dp)
+            modifier = Modifier.padding(start = 10.dp, end = 10.dp, top = 5.dp)
         )
         if (loading) {
             Box(modifier = Modifier.size(200.dp), contentAlignment = Alignment.Center) {

@@ -60,7 +60,7 @@ val itemList = mutableStateListOf<String>()
 @Composable
 fun ListObject(navController: NavHostController) {
     Column {
-        TopBackground(navController)
+        TopBackground()
         TextField()
         ListObjectDisplay()
         ButtonAtScreenBottom(navController)
@@ -69,7 +69,7 @@ fun ListObject(navController: NavHostController) {
 
 
 @Composable
-fun TopBackground(navController: NavHostController) {
+fun TopBackground() {
     Row(
         modifier = Modifier.padding(top = 16.dp)
     ) {
