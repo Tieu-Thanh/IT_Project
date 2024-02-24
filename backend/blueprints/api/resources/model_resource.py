@@ -1,76 +1,72 @@
 from flask import request
 import os
-from flask_restful import Resource
+from flask_restful import Resource,reqparse
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from blueprints.api.models.Model import Model
 from blueprints.api.models.Crawler import Crawler
 
 
 class ModelResource(Resource):
-    # def post(self):
-    #     # Extract form data directly from request
-    #     model_id = request.form.get('model_id')
-    #     user_id = request.form.get('user_id')
-    #     model_name = request.form.get('model_name')
-    #     classes = request.form.get('classes')
-    #     images = request.files.getlist('images')
-    #
-    #     # Save on Storage and get urls
-    #     img_urls = Model.save_images_to_url(user_id, model_name, images)
-    #
-    #     # Save to firestore
-    #     model = Model(
-    #         model_id=model_id,
-    #         user_id=user_id,
-    #         model_name=model_name,
-    #         classes=classes,
-    #         img_urls=img_urls
-    #     )
-    #     model.save_to_db()
-    #
-    #     return {'message': 'Image uploaded successfully', 'url': img_urls}, 201
+    def __init__(self):
+        self.parser = reqparse.RequestParser()
+        self.parser.add_argument('model_id', type=str)
+        self.parser.add_argument('user_id', type=str)
+        self.parser.add_argument('model_name', type=str)
+        self.parser.add_argument('classes', type=str, action='append')
+        self.parser.add_argument('crawl_number', type=int)
 
     def post(self):
-        model_id = request.form.get('model_id')
-        user_id = request.form.get('user_id')
-        model_name = request.form.get('model_name')
-        classes = request.form.getlist('classes')  # Assuming 'classes' are sent as a list
-        images = request.files.getlist('images')
+        args = self.parser.parse_args()
+        model_id = args['model_id']
+        user_id = args['user_id']
+        model_name = args['model_name']
+        classes = args['classes']
+        crawl_number = args['crawl_number']
+        # images = request.files.getlist('images')
 
-        # Define the local directory path for saving crawled images
-        base_path = "D:\\Workspace\\IT_Project\\backend\\blueprints\\detection\\Images"
-        model_path = os.path.join(base_path, user_id, model_name)
+        # # Define the local directory path for saving crawled images
+        # base_path = "D:\\Workspace\\IT_Project\\backend\\blueprints\\detection\\Images"
+        # model_path = os.path.join(base_path, user_id, model_name)
+        #
+        # # Use ThreadPoolExecutor to run tasks in parallel
+        # with ThreadPoolExecutor() as executor:
+        #     # Task 1: Upload images to Firebase Storage
+        #     future_upload = executor.submit(Model.save_images_to_url, user_id, model_name, images)
+        #
+        #     # Task 2: Crawl images and save them locally
+        #     # Assuming modifications to Crawler to accept parameters and return list of images directly
+        #     crawler = Crawler()
+        #     future_crawl = executor.submit(crawler.crawl, classes, img_num=crawl_number)  # Example parameters
+        #     # Ensure download_images is adapted to work with the result of crawl
+        #
+        #     # Wait for both futures to complete
+        #     img_urls = future_upload.result()  # Wait for the upload task to complete
+        #     crawled_images = future_crawl.result()  # Wait for the crawl task to complete
+        #     # Assuming crawled_images is a list of Image objects or similar
+        #     # Now, trigger download of crawled images using the list
+        #     crawler.download_images(crawled_images, download_folder=model_path)
 
-        # Use ThreadPoolExecutor to run tasks in parallel
-        with ThreadPoolExecutor() as executor:
-            # Task 1: Upload images to Firebase Storage
-            future_upload = executor.submit(Model.save_images_to_url, user_id, model_name, images)
+        # Crawl images
+        crawler = Crawler()
+        images = crawler.crawl(classes, crawl_number)
+        HOME = os.getcwd()
+        img_folder = os.path.join(HOME, "blueprints", "detection", "Images")
+        # print(HOME)
+        crawler.download_images(images, download_folder=img_folder)
 
-            # Task 2: Crawl images and save them locally
-            # Assuming modifications to Crawler to accept parameters and return list of images directly
-            crawler = Crawler()
-            future_crawl = executor.submit(crawler.crawl, classes, img_num=5)  # Example parameters
-            # Ensure download_images is adapted to work with the result of crawl
-
-            # Wait for both futures to complete
-            img_urls = future_upload.result()  # Wait for the upload task to complete
-            crawled_images = future_crawl.result()  # Wait for the crawl task to complete
-            # Assuming crawled_images is a list of Image objects or similar
-            # Now, trigger download of crawled images using the list
-            crawler.download_images(crawled_images, download_folder=model_path)
-
-        # Assuming the rest of the logic remains the same for creating a Model instance
+        # creating a Model instance
         model = Model(
             model_id=model_id,
             user_id=user_id,
             model_name=model_name,
             classes=classes,
-            img_urls=img_urls  # This contains URLs from Firebase
+            crawl_number=crawl_number,
+            img_urls=[]  # This contains URLs from Firebase
         )
         model.save_to_db()
 
         # Respond with success message and any relevant data
-        return {'message': 'Model created and images processed', 'img_urls': img_urls}, 201
+        return {'message': 'Model created and images processed', 'model': model.to_dict()}, 201
 
     def get(self):
         try:
@@ -102,3 +98,23 @@ class ModelDetailResource(Resource):
 
         except Exception as e:
             return {'message': str(e)}, 500
+
+
+class ModelImages(Resource):
+    def post(self, model_id):
+        images = request.files.getlist('images')
+        # Retrieve the model from Firestore
+        model = Model.get_model_detail(model_id)
+        if model is None:
+            return {"message": "Model not found"}, 404
+
+        # Upload images to Firebase Storage and get URLs
+        img_urls = Model.save_images_to_url(model.user_id, model.model_name, images)
+
+        # Update the model's img_urls attribute
+        model.img_urls += img_urls  # Append new URLs to existing list
+        model.save_to_db()
+
+        return {"message": "Images uploaded and model updated successfully",
+                "img_urls": img_urls,
+                "model": model.to_dict()}, 200

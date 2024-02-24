@@ -75,33 +75,32 @@ class Crawler:
             os.makedirs(folder_name)
 
     def download_images(self, images, download_folder="Images"):
-        self.create_download_folder(download_folder)
+        self.create_download_folder(download_folder) # create folder
 
         for img in images:
-            folder_path = os.path.join(download_folder, img.query)
-            self.create_download_folder(folder_path)
-
             filename = f"{img.query}_{img.image_id}.jpg"
-            filepath = os.path.join(folder_path, filename)
+            filepath = os.path.join(download_folder, filename)
 
             response = requests.get(img.url)
             if response.status_code == 200:
                 with open(filepath, 'wb') as file:
                     file.write(response.content)
-                print(f"Downloaded: {filename}")
+                print(f"Downloaded: {filepath}")
             else:
                 print(f"Failed to download: {filename}")
 
 
 if __name__ == "__main__":
-    # Crawl images
-    queries = ["hawk", "tiger", "grass hopper"]
-    crawler = Crawler()
-    images_data = crawler.crawl(queries, img_num=5)
-    print(images_data)
+    # # Crawl images
+    # queries = ["hawk", "tiger", "grass hopper"]
+    # crawler = Crawler()
+    # images_data = crawler.crawl(queries, img_num=5)
+    # print(images_data)
+
     # Download images
-    # os.chdir("../../../..")
-    # HOME = os.getcwd()
-    # img_folder = os.path.join(HOME, "detection", "Images")
-    # # print(img_folder)
+    os.chdir("../../")
+    HOME = os.getcwd()
+    print(HOME)
+    img_folder = os.path.join(HOME, "detection", "Images")
+    print(img_folder)
     # crawler.download_images(images_data, download_folder=img_folder)
