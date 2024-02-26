@@ -1,3 +1,4 @@
+from firebase_admin import firestore
 from flask import request
 import os
 from flask_restful import Resource,reqparse
@@ -118,3 +119,37 @@ class ModelImages(Resource):
         return {"message": "Images uploaded and model updated successfully",
                 "img_urls": img_urls,
                 "model": model.to_dict()}, 200
+
+
+class ModelVideoResource(Resource):
+    def __init__(self):
+        self.parser = reqparse.RequestParser()
+        self.parser.add_argument('video_id', type=str, required=True)
+        self.parser.add_argument('url', type=str, required=True)
+
+    def post(self, model_id):
+        args = self.parser.parse_args()
+        video_id = args['video_id']
+        url = args['url']
+
+        if not url:
+            return {"message": "No url provided"}, 400
+
+        try:
+            db = firestore.client()
+            model_ref = db.collection('models').document(model_id)
+
+            if not model_ref.get().exists:
+                return {"message": "Model not found"}, 404
+
+            video_doc = model_ref.collection('videos').document(video_id)
+            video_doc.set({
+                'video_id': video_id,
+                'url': url}
+            )
+
+            video_data = video_doc.get().to_dict()
+            return {"message": "Video saved successfully",
+                    "video": video_data}, 201
+        except Exception as e:
+            return {"message": str(e)}, 500
