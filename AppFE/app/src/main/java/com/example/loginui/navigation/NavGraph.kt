@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.loginui.core.Repository
 import com.example.loginui.FunctionDetail.Co_function
 import com.example.loginui.FunctionDetail.DM_function
 import com.example.loginui.Screen.AnimatedSplash
@@ -18,6 +19,7 @@ import com.example.loginui.SubScreen.Contact_us
 import com.example.loginui.SubScreen.News
 
 var user: String = ""
+var repo = Repository()
 @Composable
 fun SetupNavGraph(navController: NavHostController) {
     NavHost(
@@ -66,6 +68,4 @@ object Graph{
     const val HOME = "home_graph"
     const val DETAILS = "details_graph"
 }
-
-
 

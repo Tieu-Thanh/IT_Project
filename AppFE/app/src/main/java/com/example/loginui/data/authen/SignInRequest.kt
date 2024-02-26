@@ -1,4 +1,4 @@
-package com.example.loginui.data
+package com.example.loginui.data.authen
 
 data class SignInRequest(
     val email: String,
@@ -6,4 +6,3 @@ data class SignInRequest(
     val returnSecureToken: Boolean = true,
     val tenantId: String? = null,
 )
-

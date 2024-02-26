@@ -1,11 +1,13 @@
 package com.example.loginui.Screen
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.graphics.Bitmap
+import android.os.Build
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
@@ -55,12 +57,14 @@ import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
-import com.example.loginui.data.ImageList
+import com.example.loginui.data.ModelResource
+import com.example.loginui.navigation.repo
 import com.example.loginui.navigation.user
-
+import java.time.Instant
+import java.util.Base64
 
 val TAG = "ModelInfo"
-val usersImages = mutableListOf<ImageList?>()
+val usersImages = mutableListOf<Bitmap?>()
 
 @Preview
 @SuppressLint("MutableCollectionMutableState", "InvalidColorHexValue")
@@ -72,6 +76,7 @@ fun ModelInfo(){
     var uploadComplete by  remember {
         mutableStateOf("Upload more image to improve the accuracy")
     }
+
     var isVisible by remember { mutableStateOf(true) }
     val bitmapList by remember { mutableStateOf(mutableStateListOf<Bitmap?>()) }
     var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
@@ -80,11 +85,12 @@ fun ModelInfo(){
         contract = ActivityResultContracts.TakePicturePreview(),
         onResult = { bitmap ->
             imageBitmap = bitmap
+            usersImages.add(bitmap)
         }
     )
     val context = LocalContext.current
     var sizeOfDefaultDataset by remember { mutableStateOf("0") }
-    createUsersImages()
+
     selectedImage?.let {
         if (isVisible){
             BoxWithConstraints(
@@ -109,15 +115,6 @@ fun ModelInfo(){
                             .shadow(300.dp, ambientColor = Color.Black)
                             .clickable { isVisible = false },
                     )
-                    LazyRow {
-                        items(itemList) { item ->
-                            Button(onClick = {
-                                addImageIntoClass(it, item)
-                            }) {
-                                Text(text = item)
-                            }
-                        }
-                    }
                 }
             }
         }
@@ -130,21 +127,7 @@ fun ModelInfo(){
         LazyRow {
             items(itemList){
                     item ->
-                Button(onClick = {
-                    val classChoose = usersImages.filter {
-                        it?.className == item
-                    }[0]
-                    classChoose.let {
-                        val totalImage = it?.imageList?.size?.plus(sizeOfDefaultDataset.toInt())!!
-                        if (totalImage > 0){    
-                            val totalImageString = totalImage.toString()
-                            Toast.makeText(context, "$item's size: $totalImageString", Toast.LENGTH_LONG).show()
-                        }
-                        else{
-                            Toast.makeText(context, "No image in $item", Toast.LENGTH_LONG).show()
-                        }
-                    }
-                }) {
+                Button(onClick = {}) {
                     Text(text = item)
                 }
             }
@@ -187,6 +170,7 @@ fun ModelInfo(){
 
         Button(onClick = {
             loading = true
+            uploadFunction(sizeOfDefaultDataset.toInt(), context)
         }
         ) {
             Text(text = "Upload")
@@ -205,33 +189,18 @@ fun ModelInfo(){
                 )
             }
         }
-        Button(
-            onClick = { //TODO: Start training model
-                },
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(16.dp)
-        ) {
-            Text("Start Training Your Model")
-        }
     }
 
 }
-fun createUsersImages(){
-    itemList.forEach{
-        usersImages.add(ImageList(it, mutableListOf()))
-    }
-}
-fun addImageIntoClass(bitmap: Bitmap,className: String){
-    usersImages.filter {
-        it?.className == className
-    }[0].let { it?.imageList?.add(bitmap) }
-}
 
-fun uploadFunction(){
+fun uploadFunction(sizeOfDefaultDataset:Int,context: Context){
+    repo.postModelInfo("Yolov8", itemList, sizeOfDefaultDataset,usersImages.toList().requireNoNulls(), context)
 
 }
-    
+
+
+
+
 @Composable
 fun ComposableProcessBar(
     percentage: Float,

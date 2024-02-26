@@ -1,4 +1,4 @@
-package com.example.loginui.data
+package com.example.loginui.data.authen
 
 data class SignInResponse(
     val idToken: String,
@@ -8,4 +8,6 @@ data class SignInResponse(
     val localId: String,
     val registered: Boolean,
 
-)
+    )
+
+

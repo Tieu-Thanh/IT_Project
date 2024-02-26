@@ -49,10 +49,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.example.loginui.API.RetrofitClient
 import com.example.loginui.R
-import com.example.loginui.data.SignInRequest
-import com.example.loginui.data.SignInResponse
+import com.example.loginui.data.authen.SignInRequest
+import com.example.loginui.data.authen.SignInResponse
+import com.example.loginui.navigation.repo
 import com.example.loginui.navigation.user
 import com.example.loginui.ui.theme.TextColor1
 import com.example.loginui.ui.theme.WhiteColor
@@ -163,7 +163,6 @@ fun SignIn(navController: NavHostController) {
             },
             placeholder = {
                 Text(text = "", color = TextColor1)
-
             },
             visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -181,32 +180,16 @@ fun SignIn(navController: NavHostController) {
         )
         Button(
             onClick = {
-                val signInRequest = SignInRequest(email, password)
-
-                val signInResponseCall: Call<SignInResponse> =
-                    RetrofitClient().authService.userLogin(signInRequest)
-                signInResponseCall.enqueue(object : Callback<SignInResponse> {
-                    override fun onResponse(
-                        call: Call<SignInResponse>,
-                        response: Response<SignInResponse>
-                    ) {
-                        if (response.isSuccessful) {
-                            Toast.makeText(context, "Login Success", Toast.LENGTH_LONG).show()
-                            user = email
-                            navController.navigate("HomeScreen")
-                            Log.d("11111111111111", "onResponse: $user")
-                        } else {
-                            Toast.makeText(context, "Login Failed", Toast.LENGTH_LONG).show()
-
-                        }
+                repo.signIn(email, password, context) {
+                    if (it) {
+                        user = email
+                        repo.updateCurrentUser(user)
+                        navController.navigate("HomeScreen")
+                        Toast.makeText(context, "Login Success", Toast.LENGTH_LONG).show()
+                    } else {
+                        Toast.makeText(context, "Login Failed", Toast.LENGTH_LONG).show()
                     }
-
-                    override fun onFailure(call: Call<SignInResponse>, t: Throwable) {
-                        Toast.makeText(context, "Login Fuck", Toast.LENGTH_LONG).show()
-                    }
-                })
-
-
+                }
             }, Modifier
                 .fillMaxWidth()
                 .height(66.dp)
