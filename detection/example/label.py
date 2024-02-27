@@ -10,7 +10,7 @@ parent = os.path.dirname(current)
 sys.path.append(parent)
 from autoannotate import Labeler
 
-
+from backend import Crawler
 # ### Example data ######
 classes = ['banana', 'orange']
 input_folder='./data_sample'

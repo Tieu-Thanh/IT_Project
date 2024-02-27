@@ -172,7 +172,7 @@ fun HomeScreen(navController: NavHostController) {
                 Column(
                     modifier = Modifier
                         .clickable {
-                            navController.navigate("Contact us")
+                            navController.navigate("Your model")
                         }
                         .padding(top = 12.dp, bottom = 12.dp, end = 8.dp, start = 8.dp)
                         .height(90.dp)
@@ -205,7 +205,7 @@ fun HomeScreen(navController: NavHostController) {
                 Column(
                     modifier = Modifier
                         .clickable {
-                            navController.navigate("About us")
+                            navController.navigate("Your model")
                         }
                         .padding(top = 12.dp, bottom = 12.dp, end = 8.dp, start = 8.dp)
                         .height(90.dp)
@@ -230,8 +230,6 @@ fun HomeScreen(navController: NavHostController) {
                         text = "About us",
                         color = Milk,
                         fontWeight = FontWeight.SemiBold,
-
-
                         )
                 }
             }

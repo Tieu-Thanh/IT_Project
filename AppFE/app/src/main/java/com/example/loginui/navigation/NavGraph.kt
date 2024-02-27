@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.loginui.core.Repository
 import com.example.loginui.FunctionDetail.Co_function
 import com.example.loginui.FunctionDetail.DM_function
 import com.example.loginui.Screen.AnimatedSplash
@@ -13,11 +14,13 @@ import com.example.loginui.Screen.ListObject
 import com.example.loginui.Screen.ModelInfo
 import com.example.loginui.Screen.SignIn
 import com.example.loginui.Screen.SignUp
+import com.example.loginui.Screen.UrlInputTextBox
 import com.example.loginui.SubScreen.About_us
 import com.example.loginui.SubScreen.Contact_us
 import com.example.loginui.SubScreen.News
 
 var user: String = ""
+var repo = Repository()
 @Composable
 fun SetupNavGraph(navController: NavHostController) {
     NavHost(
@@ -39,7 +42,7 @@ fun SetupNavGraph(navController: NavHostController) {
         composable("Contact us") {
             Contact_us(navController = navController)
         }
-        composable("About us") {
+        composable("Your model") {
             About_us(navController = navController)
         }
         composable("HomeScreen") {
@@ -57,15 +60,10 @@ fun SetupNavGraph(navController: NavHostController) {
         composable("ModelInfo"){
             ModelInfo()
         }
+        composable("Check model"){
+            UrlInputTextBox(navController = navController)
+        }
     }
 }
-
-object Graph{
-    const val ROOT = "nav_graph"
-    const val AUTHENTICATION = "auth_graph"
-    const val HOME = "home_graph"
-    const val DETAILS = "details_graph"
-}
-
 
 
