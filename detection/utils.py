@@ -39,10 +39,10 @@ def draw_bbox(image, preds, classes , hide_conf=False, hide_labels=False):
             if hide_labels
             else (classes[c] if hide_conf else f"{classes[c]} {conf:.2f}")
         )
-        if not hide_conf:
-            print(' xyxy,  conf, cls:', xyxy, conf, c )
-        else:
-            print(' xyxy,  cls:', xyxy, c )
+        # if not hide_conf:
+            # print(' xyxy,  conf, cls:', xyxy, conf, c )
+        # else:
+            # print(' xyxy,  cls:', xyxy, c )
         annotator.box_label(xyxy, label, color=colors(c, True))
 
     img_with_bboxes = annotator.result()
