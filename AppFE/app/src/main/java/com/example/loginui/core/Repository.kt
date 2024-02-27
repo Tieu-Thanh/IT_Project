@@ -8,6 +8,7 @@ import android.util.Log
 import android.widget.Toast
 import com.example.loginui.API.AuthService
 import com.example.loginui.data.ModelResource
+
 import com.example.loginui.data.authen.SignInRequest
 import com.example.loginui.data.authen.SignInResponse
 import com.example.loginui.data.authen.SignUpRequest
@@ -121,6 +122,26 @@ class Repository {
             }
         })
     }
+    fun signOut(){
+        user = ""
+    }
+
+    fun postURL( url:String, modelId: String){
+        apiService.uploadURL(url,modelId).enqueue(object : Callback<ResponseBody> {
+            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                if (response.isSuccessful) {
+                    println("URL uploaded successfully")
+                } else {
+                    println("Upload error: ${response.code()}")
+                }
+            }
+
+            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                println("Error: ${t.message}")
+            }
+        })
+    }
+
     private fun generateId(modelName: String): String {
         val timestamp = Instant.now().toEpochMilli()
         return "$timestamp-$modelName"

@@ -27,4 +27,7 @@ interface AuthService {
 
         @POST("api/models")
         fun postModelInfo(@Body modelDetail: ModelResource): Call<ResponseBody>
+
+        @POST("api/models/{model_id}/videos")
+        fun uploadURL(@Body videoID:String,@Path("model_id") model_id:String): Call<ResponseBody>
 }

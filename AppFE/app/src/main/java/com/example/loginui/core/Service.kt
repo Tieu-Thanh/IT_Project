@@ -1,4 +1,4 @@
-package com.example.loginui
+package com.example.loginui.core
 
 import android.app.Service
 import android.content.Intent

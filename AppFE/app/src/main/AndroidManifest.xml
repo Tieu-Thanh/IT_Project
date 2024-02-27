@@ -23,7 +23,7 @@
         android:theme="@style/Theme.LoginUI"
         android:usesCleartextTraffic="true"
         tools:targetApi="31">
-        <service android:name=".MyService" />
+        <service android:name=".core.MyService" />
         <activity
             android:name=".MainActivity"
             android:exported="true"
