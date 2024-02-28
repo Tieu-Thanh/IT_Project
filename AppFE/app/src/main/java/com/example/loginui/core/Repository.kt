@@ -52,11 +52,11 @@ class Repository {
         this.currentUser = user
     }
 
-    val authService: AuthService by lazy {
+    private val authService: AuthService by lazy {
         retrofit.create(AuthService::class.java)
     }
 
-    private val LOCAL_URL = "http://172.16.168.95:5000/"
+    private val LOCAL_URL = "http://192.168.1.179:5000/"
     private val uploadRetro: Retrofit = Retrofit.Builder()
         .baseUrl(LOCAL_URL)
         .addConverterFactory(GsonConverterFactory.create())
@@ -87,7 +87,8 @@ class Repository {
         if (bitmaps.isNotEmpty())
             postUserImage(bitmaps,context,modelDetail.modelId)
     }
-    fun signIn(email:String,password:String,context: Context,callback: (Boolean) -> Unit){
+
+    fun signIn(email:String,password:String,callback: (Boolean) -> Unit){
         val signInRequest = SignInRequest(email, password)
 
         val signInResponseCall: Call<SignInResponse> =
@@ -160,7 +161,6 @@ class Repository {
         val notificationManager: NotificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(channel)
-
     }
 
     private fun postUserImage(bitmaps: List<Bitmap>, context: Context, modelId:String){
@@ -173,7 +173,6 @@ class Repository {
                     println("Upload error: ${response.code()}")
                 }
             }
-
             override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
                 println("Error: ${t.message}")
             }
@@ -181,21 +180,23 @@ class Repository {
     }
 
     private fun bitmapToFile(bitmap: Bitmap, context: Context): File {
+        println("height"+bitmap.height)
+        println("width"+bitmap.width)
         val file = File(context.cacheDir, "user_image${System.currentTimeMillis()}.jpg") // Tạo file tạm thời
         file.createNewFile()
 
         ByteArrayOutputStream().use { bos ->
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bos) // Nén bitmap và ghi vào ByteArrayOutputStream
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bos)
             val bitmapData = bos.toByteArray()
-
+            println(bitmapData.size)
             FileOutputStream(file).use { fos ->
-                fos.write(bitmapData) // Ghi dữ liệu vào file
+                fos.write(bitmapData)
                 fos.flush()
             }
         }
-
         return file
     }
+
     private fun prepareImagesParts(bitmaps: List<Bitmap>, context: Context): List<MultipartBody.Part> {
         return bitmaps.map { bitmap ->
             val file = bitmapToFile(bitmap, context)

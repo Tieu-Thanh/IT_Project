@@ -84,5 +84,7 @@ dependencies {
     implementation ("com.squareup.retrofit2:retrofit:2.9.0")
     implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+    implementation ("com.pierfrancescosoffritti.androidyoutubeplayer:chromecast-sender:0.28")
+
     implementation ("androidx.constraintlayout:constraintlayout-compose:1.0.1")
 }

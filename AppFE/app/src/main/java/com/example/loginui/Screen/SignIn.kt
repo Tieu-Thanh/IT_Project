@@ -180,7 +180,7 @@ fun SignIn(navController: NavHostController) {
         )
         Button(
             onClick = {
-                repo.signIn(email, password, context) {
+                repo.signIn(email, password) {
                     if (it) {
                         user = email
                         repo.updateCurrentUser(user)

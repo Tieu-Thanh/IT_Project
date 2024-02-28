@@ -119,6 +119,7 @@ fun ModelInfo(){
             }
         }
     }
+
     Column {
         Text(text ="Model Info", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
         Text(text = "Email: $user")
@@ -195,7 +196,6 @@ fun ModelInfo(){
 
 fun uploadFunction(sizeOfDefaultDataset:Int,context: Context){
     repo.postModelInfo("Yolov8", itemList, sizeOfDefaultDataset,usersImages.toList().requireNoNulls(), context)
-
 }
 
 
