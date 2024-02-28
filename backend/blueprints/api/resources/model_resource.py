@@ -1,4 +1,4 @@
-from firebase_admin import firestore
+from firebase_admin import firestore, storage
 from flask import request
 import os
 from flask_restful import Resource,reqparse
@@ -23,36 +23,17 @@ class ModelResource(Resource):
         model_name = args['model_name']
         classes = args['classes']
         crawl_number = args['crawl_number']
-        # images = request.files.getlist('images')
 
-        # # Define the local directory path for saving crawled images
-        # base_path = "D:\\Workspace\\IT_Project\\backend\\blueprints\\detection\\Images"
-        # model_path = os.path.join(base_path, user_id, model_name)
-        #
-        # # Use ThreadPoolExecutor to run tasks in parallel
-        # with ThreadPoolExecutor() as executor:
-        #     # Task 1: Upload images to Firebase Storage
-        #     future_upload = executor.submit(Model.save_images_to_url, user_id, model_name, images)
-        #
-        #     # Task 2: Crawl images and save them locally
-        #     # Assuming modifications to Crawler to accept parameters and return list of images directly
-        #     crawler = Crawler()
-        #     future_crawl = executor.submit(crawler.crawl, classes, img_num=crawl_number)  # Example parameters
-        #     # Ensure download_images is adapted to work with the result of crawl
-        #
-        #     # Wait for both futures to complete
-        #     img_urls = future_upload.result()  # Wait for the upload task to complete
-        #     crawled_images = future_crawl.result()  # Wait for the crawl task to complete
-        #     # Assuming crawled_images is a list of Image objects or similar
-        #     # Now, trigger download of crawled images using the list
-        #     crawler.download_images(crawled_images, download_folder=model_path)
+        # Create Storage folder
+        bucket = storage.bucket()
+        blob = bucket.blob(f"{user_id}/{model_name}/.ignore")
+        blob.upload_from_string('', content_type='text/plain')
 
         # Crawl images
         crawler = Crawler()
         images = crawler.crawl(classes, crawl_number)
         HOME = os.getcwd()
         img_folder = os.path.join(HOME, "blueprints", "detection", "Images")
-        # print(HOME)
         crawler.download_images(images, download_folder=img_folder)
 
         # creating a Model instance
