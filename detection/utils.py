@@ -27,13 +27,11 @@ def draw_bbox(image, preds, classes , hide_conf=False, hide_labels=False):
 
         if float(xyxy[0]) <1 and float(xyxy[3]) < 1:
             # convert ratio to pixel
-            print('xyyx is ratio')
             xyxy_copy = xyxy.copy()
             xyxy[0], xyxy[2] = float(xyxy_copy[0])*w, float(xyxy_copy[2])*w
             xyxy[1], xyxy[3] = float(xyxy_copy[1])*h, float(xyxy_copy[3])*h
 
         annotator = Annotator(im0, line_width=line_thickness)
-        label=None
         label = (
             None
             if hide_labels
@@ -51,7 +49,7 @@ def draw_bbox(image, preds, classes , hide_conf=False, hide_labels=False):
 def draw_bbox_SAM(image, preds, classes , hide_conf=False, hide_labels=False):
     '''
         Draw bounding box, for SAM-type prediction, which is segmentation
-            `preds`: format [[classs, x1, y1, x2, y2, ...], [...], ...]
+            `preds`: format [[class, x1, y1, x2, y2, ...], [...], ...]
                 Example of 1 bbox: [0 0.48913 0.10383 0.48188 0.11475 0.48188 0.12022, ...]
     '''
     # Convert segment to bounding box

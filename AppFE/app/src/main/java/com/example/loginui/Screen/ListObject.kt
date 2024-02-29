@@ -136,7 +136,6 @@ fun TextField() {
                 }
             },
             modifier = Modifier
-
                 .alignByBaseline()
                 .padding(top = 12.dp),
             shape = RoundedCornerShape(10.dp),
@@ -183,7 +182,6 @@ fun ListObjectDisplay() {
                 color = Color.Black,
                 shape = MaterialTheme.shapes.medium
             )
-
     ) {
         LazyColumn(
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
@@ -202,8 +200,6 @@ fun ListObjectDisplay() {
                 }
             }
         }
-
-
     }
 
 }
@@ -234,7 +230,7 @@ fun ButtonAtScreenBottom(navController: NavHostController) {
         ) {
             Icon(
                 imageVector = Icons.Rounded.ArrowForward,
-                contentDescription = "Foward",
+                contentDescription = "Forward",
                 modifier = Modifier.size(30.dp),
                 tint = Milk
             )
