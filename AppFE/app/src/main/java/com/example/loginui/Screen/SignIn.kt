@@ -54,6 +54,7 @@ import com.example.loginui.data.authen.SignInRequest
 import com.example.loginui.data.authen.SignInResponse
 import com.example.loginui.navigation.repo
 import com.example.loginui.navigation.user
+import com.example.loginui.ui.theme.Milk
 import com.example.loginui.ui.theme.TextColor1
 import com.example.loginui.ui.theme.WhiteColor
 import com.example.loginui.ui.theme.interFontFamily
@@ -180,16 +181,16 @@ fun SignIn(navController: NavHostController) {
         )
         Button(
             onClick = {
-                repo.signIn(email, password) {
-                    if (it) {
-                        user = email
-                        repo.updateCurrentUser(user)
+//                repo.signIn(email, password) {
+//                    if (it) {
+//                        user = email
+//                        repo.updateCurrentUser(user)
                         navController.navigate("HomeScreen")
-                        Toast.makeText(context, "Login Success", Toast.LENGTH_LONG).show()
-                    } else {
-                        Toast.makeText(context, "Login Failed", Toast.LENGTH_LONG).show()
-                    }
-                }
+//                        Toast.makeText(context, "Login Success", Toast.LENGTH_LONG).show()
+//                    } else {
+//                        Toast.makeText(context, "Login Failed", Toast.LENGTH_LONG).show()
+//                    }
+//                }
             }, Modifier
                 .fillMaxWidth()
                 .height(66.dp)
@@ -202,7 +203,8 @@ fun SignIn(navController: NavHostController) {
                 text = "Sign In",
                 fontFamily = interFontFamily,
                 fontSize = 18.sp,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                color = Milk
             )
         }
         Row {

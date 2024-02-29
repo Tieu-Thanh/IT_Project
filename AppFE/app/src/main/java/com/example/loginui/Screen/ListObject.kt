@@ -2,6 +2,7 @@ package com.example.loginui.Screen
 
 import android.annotation.SuppressLint
 import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
@@ -51,6 +52,7 @@ import com.example.loginui.ui.theme.DarkSpecEnd
 import com.example.loginui.ui.theme.DarkSpecStart
 import com.example.loginui.ui.theme.Milk
 import com.example.loginui.ui.theme.TextColor1
+import com.example.loginui.ui.theme.WhiteColor
 import com.example.loginui.ui.theme.interFontFamily
 
 val itemList = mutableStateListOf<String>()
@@ -58,7 +60,9 @@ val itemList = mutableStateListOf<String>()
 @SuppressLint("UnrememberedMutableState")
 @Composable
 fun ListObject(navController: NavHostController) {
-    Column {
+    Column (
+        modifier = Modifier.background(color = WhiteColor)
+    ){
         TopBackground(navController)
         TextField()
         ListObjectDisplay()
@@ -173,7 +177,7 @@ fun ListObjectDisplay() {
         modifier = Modifier
             .padding(start = 8.dp, top = 10.dp, end = 8.dp)
             .fillMaxWidth()
-            .height(610.dp)
+            .height(500.dp)
             .border(
                 width = 2.dp,
                 color = Color.Black,
