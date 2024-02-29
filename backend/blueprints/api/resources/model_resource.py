@@ -1,6 +1,7 @@
 from firebase_admin import firestore, storage
 from flask import request
 import os
+import uuid
 from flask_restful import Resource,reqparse
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from blueprints.api.models.Model import Model
@@ -103,25 +104,37 @@ class ModelImages(Resource):
 
 
 class ModelVideoResource(Resource):
-    def __init__(self):
-        self.parser = reqparse.RequestParser()
-        self.parser.add_argument('video_id', type=str, required=True)
-        self.parser.add_argument('url', type=str, required=True)
+    # def __init__(self):
+    #     self.parser = reqparse.RequestParser()
+    #     # self.parser.add_argument('video_id', type=str, required=True)
+    #     self.parser.add_argument('url', type=str, store_missing=False)
 
     def post(self, model_id):
-        args = self.parser.parse_args()
-        video_id = args['video_id']
-        url = args['url']
+        # args = self.parser.parse_args()
+        # video_id = args['video_id']
+        url = request.form.get('url')
+        video_file = request.files.get('video')
 
-        if not url:
-            return {"message": "No url provided"}, 400
+        if not url and not video_file:
+            return {"message": "No url provided or video provided"}, 400
 
         try:
             db = firestore.client()
             model_ref = db.collection('models').document(model_id)
-
-            if not model_ref.get().exists:
+            model_doc = model_ref.get()
+            if not model_doc.exists:
                 return {"message": "Model not found"}, 404
+
+            video_id = str(uuid.uuid4())
+
+            # upload video if video is provided
+            data = model_doc.to_dict()
+            if video_file:
+                bucket = storage.bucket()
+                blob = bucket.blob(f"{data['user_id']}/{data['model_name']}/videos/"+video_file.filename)
+                blob.upload_from_file(video_file.stream, content_type=video_file.content_type)
+
+                url = blob.public_url
 
             video_doc = model_ref.collection('videos').document(video_id)
             video_doc.set({
