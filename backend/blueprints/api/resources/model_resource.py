@@ -2,7 +2,7 @@ from firebase_admin import firestore, storage
 from flask import request
 import os
 import uuid
-from flask_restful import Resource,reqparse
+from flask_restful import Resource, reqparse
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from blueprints.api.models.Model import Model
 from blueprints.api.models.Crawler import Crawler
