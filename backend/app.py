@@ -4,6 +4,7 @@ from firebase_admin import credentials, firestore, storage
 
 from blueprints.api.views.model_api import model_api_bp
 from blueprints.api.views.user_api import user_api_bp
+from blueprints.api.views.yolo_api import yolo_api_bp
 
 app = Flask(__name__)
 
@@ -23,6 +24,8 @@ bucket = storage.bucket()
 # Register blueprint
 app.register_blueprint(model_api_bp, url_prefix='/api/models')
 app.register_blueprint(user_api_bp, url_prefix='/api/users')
+app.register_blueprint(yolo_api_bp, url_prefix='/api/yolo')
+
 
 @app.route('/')
 def hello_world():
