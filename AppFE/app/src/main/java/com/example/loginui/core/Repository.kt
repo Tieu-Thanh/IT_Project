@@ -5,9 +5,10 @@ import android.app.NotificationManager
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
-import android.widget.Toast
 import com.example.loginui.API.AuthService
+import com.example.loginui.BuildConfig
 import com.example.loginui.data.ModelResource
+import com.example.loginui.data.User
 
 import com.example.loginui.data.authen.SignInRequest
 import com.example.loginui.data.authen.SignInResponse
@@ -30,11 +31,13 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.time.Instant
+import java.time.LocalDate
 import java.util.Base64
+import kotlin.math.log
 
 class Repository {
 
-    private val LOGIN_URL = "https://identitytoolkit.googleapis.com/"
+    private val LOGIN_URL = BuildConfig.LOGIN_URL
     private var currentUser: String = ""
     private val retrofit: Retrofit by lazy {
         val httpLoggingInterceptor = HttpLoggingInterceptor().apply {
@@ -52,18 +55,35 @@ class Repository {
         this.currentUser = user
     }
 
-    val authService: AuthService by lazy {
+    private val authService: AuthService by lazy {
         retrofit.create(AuthService::class.java)
     }
+    fun createStorage(user_id:User, callback: (Boolean) -> Unit){
 
-    private val LOCAL_URL = "http://172.16.168.95:5000/"
+        apiService.createStorage(user_id).enqueue(object : Callback<ResponseBody>{
+            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                Log.d("11111111", "onResponse: ${response.code()}")
+                Log.d("1111111", "onResponse: ${response.body()}")
+                if(response.isSuccessful){
+                    callback(true)
+                }
+            }
+
+            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                println("Storage Creation Failed")
+                callback(false)
+                print(t.message)
+            }
+        })
+    }
+    private val LOCAL_URL = BuildConfig.LOCAL_URL
     private val uploadRetro: Retrofit = Retrofit.Builder()
         .baseUrl(LOCAL_URL)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
     val apiService = uploadRetro.create(AuthService::class.java)
     fun postModelInfo(modelName: String,classes:List<String>,dataSize:Int, bitmaps: List<Bitmap>, context: Context){
-        val modelId = encodeObjectId(modelName)
+        val modelId = encodeObjectId(modelName+"cs:${classes.size}")
         val modelDetail = ModelResource(
             modelId,
             currentUser,
@@ -87,7 +107,8 @@ class Repository {
         if (bitmaps.isNotEmpty())
             postUserImage(bitmaps,context,modelDetail.modelId)
     }
-    fun signIn(email:String,password:String,context: Context,callback: (Boolean) -> Unit){
+
+    fun signIn(email:String,password:String,callback: (Boolean) -> Unit){
         val signInRequest = SignInRequest(email, password)
 
         val signInResponseCall: Call<SignInResponse> =
@@ -99,8 +120,7 @@ class Repository {
             ) {
                 if (response.isSuccessful) {
                     callback(true)
-                    user = email
-                    repo.updateCurrentUser(user)
+                    updateCurrentUser(response.body()?.localId.toString())
                 } else {
                     callback(false)
                 }
@@ -110,15 +130,17 @@ class Repository {
             }
         })
     }
-    fun signup(email: String, password: String, callback: (Int) -> Unit) {
+    fun signup(email: String, password: String, callback: (Int, String) -> Unit) {
         val signUpRequest = SignUpRequest(email, password)
         authService.userSignUp(signUpRequest).enqueue(object : Callback<SignUpResponse> {
             override fun onResponse(call: Call<SignUpResponse>, response: Response<SignUpResponse>) {
-                callback(response.code())
+                Log.d("111", "onResponse: ${response.code()}")
+                callback(response.code(), response.body()?.localId.toString())
+
             }
 
             override fun onFailure(call: Call<SignUpResponse>, t: Throwable) {
-                callback(500)
+                callback(500,"")
             }
         })
     }
@@ -143,8 +165,8 @@ class Repository {
     }
 
     private fun generateId(modelName: String): String {
-        val timestamp = Instant.now().toEpochMilli()
-        return "$timestamp-$modelName"
+        val date = LocalDate.now()
+        return "$date-$modelName"
     }
 
     private fun encodeObjectId(modelName: String): String {
@@ -160,7 +182,6 @@ class Repository {
         val notificationManager: NotificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(channel)
-
     }
 
     private fun postUserImage(bitmaps: List<Bitmap>, context: Context, modelId:String){
@@ -173,7 +194,6 @@ class Repository {
                     println("Upload error: ${response.code()}")
                 }
             }
-
             override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
                 println("Error: ${t.message}")
             }
@@ -181,27 +201,43 @@ class Repository {
     }
 
     private fun bitmapToFile(bitmap: Bitmap, context: Context): File {
+        println("height"+bitmap.height)
+        println("width"+bitmap.width)
         val file = File(context.cacheDir, "user_image${System.currentTimeMillis()}.jpg") // Tạo file tạm thời
         file.createNewFile()
 
         ByteArrayOutputStream().use { bos ->
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bos) // Nén bitmap và ghi vào ByteArrayOutputStream
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bos)
             val bitmapData = bos.toByteArray()
-
+            println(bitmapData.size)
             FileOutputStream(file).use { fos ->
-                fos.write(bitmapData) // Ghi dữ liệu vào file
+                fos.write(bitmapData)
                 fos.flush()
             }
         }
-
         return file
     }
+
     private fun prepareImagesParts(bitmaps: List<Bitmap>, context: Context): List<MultipartBody.Part> {
         return bitmaps.map { bitmap ->
             val file = bitmapToFile(bitmap, context)
             val requestFile = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
             MultipartBody.Part.createFormData("images", file.name, requestFile)
         }
+    }
+    fun getModelList(callback: (List<ModelResource>) -> Unit){
+        apiService.getModelInfo(currentUser).enqueue(object : Callback<ResponseBody>{
+            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
+                if(response.isSuccessful){
+                    val modelList = response.body()?.string()
+                    println(modelList)
+                }
+            }
+
+            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+                println("Error: ${t.message}")
+            }
+        })
     }
 
 }

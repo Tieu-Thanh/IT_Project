@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.loginui.R
+import com.example.loginui.data.User
 import com.example.loginui.navigation.repo
 import com.example.loginui.ui.theme.TextColor1
 import com.example.loginui.ui.theme.WhiteColor
@@ -260,15 +261,23 @@ fun SignUp(navController: NavHostController) {
         val context = LocalContext.current
         Button(
             onClick = {
-                    repo.signup(email, pass) {
-                        when (it){
+                    repo.signup(email, pass) {code, idToken ->
+                        when (code){
                             200 -> {
-                                Toast.makeText(context, "Sign Up Successful", Toast.LENGTH_SHORT).show()
-                                navController.navigate("SignIn")
+
+                                Toast.makeText(context, "Sign Up Success", Toast.LENGTH_SHORT).show()
+                                repo.createStorage(User(idToken)) {
+                                    if (it) {
+                                        repo.updateCurrentUser(idToken)
+                                        navController.navigate("HomeScreen")
+                                    }
+                                }
                             }
                             400 -> {
-                                Log.d(TAG, "SignUp: aaaa")
                                 Toast.makeText(context, "Email already exists", Toast.LENGTH_SHORT).show()
+                            }
+                            405 -> {
+                                Toast.makeText(context, "Storage Create Failed", Toast.LENGTH_SHORT).show()
                             }
                             else -> {
                                 Toast.makeText(context, "Sign Up Failed", Toast.LENGTH_SHORT).show()

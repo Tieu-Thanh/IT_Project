@@ -13,11 +13,14 @@ android {
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
-
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
+        buildConfigField("String", "API_KEY",System.getenv()["API_KEY"]?: properties["API_KEY"] as String)
+        buildConfigField("String", "LOGIN_URL","${properties["LOGIN_URL"]}")
+        buildConfigField("String", "LOCAL_URL", "${properties["LOCAL_URL"]}")
+
     }
 
     buildTypes {
@@ -38,6 +41,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
@@ -84,5 +88,7 @@ dependencies {
     implementation ("com.squareup.retrofit2:retrofit:2.9.0")
     implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+    implementation ("com.pierfrancescosoffritti.androidyoutubeplayer:chromecast-sender:0.28")
+
     implementation ("androidx.constraintlayout:constraintlayout-compose:1.0.1")
 }

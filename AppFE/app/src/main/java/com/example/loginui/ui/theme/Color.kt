@@ -30,3 +30,5 @@ val DarkSpecEnd = Color(0xFF414345)
 
 val JaipurStart = Color(0xFF9796f0)
 val JaipurEnd = Color(0xFFfbc7d4)
+
+val GoldSand = Color(0xFFDECBA4)

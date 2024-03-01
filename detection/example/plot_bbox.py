@@ -8,8 +8,8 @@ parent = os.path.dirname(current)
 sys.path.append(parent)
 from utils import draw_bbox
 
-imgpath = '/home/thekhoi/futme/IT_Project/detection/example/data_sample_labeled/valid/images/im3.jpg'
-lblpath = '/home/thekhoi/futme/IT_Project/detection/example/data_sample_labeled/valid/labels/im3.txt'
+imgpath = f'{HOME}/data_sample_labeled/train/images/im3.jpg'
+lblpath = f'{HOME}/data_sample_labeled/train/labels/im3.txt'
 
 classes = ['banana', 'orange']
 img = cv2.imread(imgpath)

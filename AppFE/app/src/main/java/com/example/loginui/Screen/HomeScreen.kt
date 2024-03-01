@@ -42,6 +42,7 @@ import com.example.loginui.ui.theme.PurpleEnd
 import com.example.loginui.ui.theme.PurpleSpecEnd
 import com.example.loginui.ui.theme.PurpleSpecStart
 import com.example.loginui.ui.theme.PurpleStart
+import com.example.loginui.ui.theme.WhiteColor
 import com.example.loginui.ui.theme.interFontFamily
 
 
@@ -59,6 +60,7 @@ fun HomeScreen(navController: NavHostController) {
 
     Column(
         modifier = Modifier
+            .background(color = WhiteColor)
             .fillMaxSize()
             .fillMaxWidth()
             .fillMaxHeight()
