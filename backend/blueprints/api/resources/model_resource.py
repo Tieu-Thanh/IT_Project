@@ -34,7 +34,7 @@ class ModelResource(Resource):
         crawler = Crawler()
         images = crawler.crawl(classes, crawl_number)
         HOME = os.getcwd()
-        img_folder = os.path.join(HOME, "blueprints", "detection", "Images")
+        img_folder = os.path.join(HOME, "blueprints", "detection", "Images", f"{user_id}", f"{model_name}")
         crawler.download_images(images, download_folder=img_folder)
 
         # creating a Model instance
