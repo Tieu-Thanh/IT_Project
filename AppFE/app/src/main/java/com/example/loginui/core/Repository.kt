@@ -10,6 +10,7 @@ import com.example.loginui.BuildConfig
 import com.example.loginui.data.ListModelResponse
 import com.example.loginui.data.ModelResource
 import com.example.loginui.data.User
+import com.example.loginui.data.Video
 
 import com.example.loginui.data.authen.SignInRequest
 import com.example.loginui.data.authen.SignInResponse
@@ -17,6 +18,8 @@ import com.example.loginui.data.authen.SignUpRequest
 import com.example.loginui.data.authen.SignUpResponse
 import com.example.loginui.navigation.repo
 import com.example.loginui.navigation.user
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.suspendCancellableCoroutine
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
@@ -32,6 +35,8 @@ import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
 import java.time.LocalDate
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 class Repository {
 
@@ -49,6 +54,7 @@ class Repository {
             .client(okHttpClient)
             .build()
     }
+    private lateinit var listModelResponse:ListModelResponse
     fun updateCurrentUser(user:String){
         this.currentUser = user
     }
@@ -132,7 +138,6 @@ class Repository {
             override fun onResponse(call: Call<SignUpResponse>, response: Response<SignUpResponse>) {
                 Log.d("111", "onResponse: ${response.code()}")
                 callback(response.code(), response.body()?.localId.toString())
-
             }
 
             override fun onFailure(call: Call<SignUpResponse>, t: Throwable) {
@@ -145,7 +150,7 @@ class Repository {
     }
 
     fun postURL( url:String, modelId: String){
-        apiService.uploadURL(url,modelId).enqueue(object : Callback<ResponseBody> {
+        apiService.uploadURL(Video(url),modelId).enqueue(object : Callback<ResponseBody> {
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                 if (response.isSuccessful) {
                     println("URL uploaded successfully")
@@ -218,22 +223,34 @@ class Repository {
             MultipartBody.Part.createFormData("images", file.name, requestFile)
         }
     }
-    fun getModelList(listModelResponse: (ListModelResponse)->Unit){
-        Log.d("1111111", "getModelList: $currentUser")
+
+    suspend fun updateModelList():ListModelResponse? = suspendCancellableCoroutine{
+        continuation ->
         apiService.getModelList(currentUser).enqueue(object : Callback<ListModelResponse> {
             override fun onResponse(call: Call<ListModelResponse>, response: Response<ListModelResponse>) {
-                Log.d("11111111111111", "onResponse: ${response.body()}")
                 if (response.isSuccessful) {
-                    Log.d("11111", "onResponse: ")
-                    listModelResponse(response.body()!!)
+                    continuation.resume(response.body()!!)
+                }
+                else {
+                    continuation.resume(null)
                 }
             }
 
             override fun onFailure(call: Call<ListModelResponse>, t: Throwable) {
-                Log.d("TAG", "onFailure: ")
+                continuation.resumeWithException(t)
             }
-
         })
+    }
+    fun setModel(ls:ListModelResponse){
+        listModelResponse = ls
+    }
+    fun getModelList():ListModelResponse{
+        return listModelResponse
+    }
+    fun getModel(model_id: String):ModelResource{
+        return listModelResponse.models.find {
+            it.modelId == model_id
+        }!!
     }
 
 }

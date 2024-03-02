@@ -4,6 +4,7 @@ import com.example.loginui.BuildConfig
 import com.example.loginui.data.ListModelResponse
 import com.example.loginui.data.ModelResource
 import com.example.loginui.data.User
+import com.example.loginui.data.Video
 import com.example.loginui.data.authen.SignInRequest
 import com.example.loginui.data.authen.SignInResponse
 import com.example.loginui.data.authen.SignUpRequest
@@ -34,8 +35,11 @@ interface AuthService {
         fun postModelInfo(@Body modelDetail: ModelResource): Call<ResponseBody>
 
         @POST("api/models/{model_id}/videos")
-        fun uploadURL(@Body videoID:String,@Path("model_id") model_id:String): Call<ResponseBody>
+        fun uploadURL(@Body videoID: Video, @Path("model_id") model_id:String): Call<ResponseBody>
 
+        @Multipart
+        @POST
+        fun uploadVideo(@Body videoID:Video,@Path("model_id") model_id: String): Call<ResponseBody>
         @GET("api/models")
         fun getModelList(@Query("user_id") field:String): Call<ListModelResponse>
 
