@@ -4,6 +4,8 @@ from flask import request
 from flask_restful import Resource, reqparse
 from blueprints.detection.Temp import Temp  # example import
 from blueprints.api.models.Model import Model
+
+
 # from blueprints.detection.yolo import Model_YOLO
 
 # from blueprints.detection.yolo import Model_YOLO
@@ -59,11 +61,9 @@ class YoloResource(Resource):
                 local_path = os.path.join(img_folder, filename)
                 download_image_from_storage(url, local_path)
 
-
         # Train Model YOLO
         # yolo = Model_YOLO()
         # yolo.train(model.classes, input_folder=img_folder)
-
 
         # return
         return {'message': 'Hello', 'data': model.to_dict(), 'model_images': model.img_urls}, 201

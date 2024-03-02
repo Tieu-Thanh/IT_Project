@@ -16,6 +16,7 @@ class ModelResource(Resource):
         self.parser.add_argument('model_name', type=str)
         self.parser.add_argument('classes', type=str, action='append')
         self.parser.add_argument('crawl_number', type=int)
+        self.parser.add_argument('accuracy', type=float)
 
     def post(self):
         args = self.parser.parse_args()
@@ -24,6 +25,7 @@ class ModelResource(Resource):
         model_name = args['model_name']
         classes = args['classes']
         crawl_number = args['crawl_number']
+        accuracy = args['accuracy']
 
         # Create Storage folder
         bucket = storage.bucket()
@@ -44,6 +46,7 @@ class ModelResource(Resource):
             model_name=model_name,
             classes=classes,
             crawl_number=crawl_number,
+            accuracy=accuracy,
             img_urls=[]  # This contains URLs from Firebase
         )
         model.save_to_db()
