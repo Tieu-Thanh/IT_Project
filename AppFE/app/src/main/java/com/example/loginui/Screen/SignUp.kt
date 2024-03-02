@@ -264,7 +264,6 @@ fun SignUp(navController: NavHostController) {
                     repo.signup(email, pass) {code, idToken ->
                         when (code){
                             200 -> {
-
                                 Toast.makeText(context, "Sign Up Success", Toast.LENGTH_SHORT).show()
                                 repo.createStorage(User(idToken)) {
                                     if (it) {
@@ -311,7 +310,6 @@ fun SignUp(navController: NavHostController) {
 
             ) {
                 Text(
-
                     text = "click here !",
                     Modifier.padding(top = 8.dp, bottom = 8.dp),
                     fontSize = 14.sp,

@@ -1,13 +1,13 @@
 package com.example.loginui.Screen
 
 import android.annotation.SuppressLint
+import android.content.ContentValues
 import android.content.Context
 import android.graphics.Bitmap
-import android.os.Build
-import android.util.Log
+import android.net.Uri
+import android.provider.MediaStore
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
@@ -85,6 +85,8 @@ import com.example.loginui.ui.theme.WhiteColor
 import com.example.loginui.ui.theme.interFontFamily
 import java.time.Instant
 import java.util.Base64
+import com.example.loginui.navigation.repo
+import com.example.loginui.navigation.user
 
 val TAG = "ModelInfo"
 val usersImages = mutableListOf<Bitmap?>()
@@ -99,21 +101,35 @@ fun ModelInfo() {
     var uploadComplete by remember {
         mutableStateOf("Upload more image to improve the accuracy")
     }
-
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
     var isVisible by remember { mutableStateOf(true) }
     val bitmapList by remember { mutableStateOf(mutableStateListOf<Bitmap?>()) }
     var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
     var selectedImage by remember { mutableStateOf<Bitmap?>(null) }
-    val takePicturePreviewLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.TakePicturePreview(),
-        onResult = { bitmap ->
-            imageBitmap = bitmap
-            usersImages.add(bitmap)
-        }
-    )
     val context = LocalContext.current
-    var sizeOfDefaultDataset by remember { mutableStateOf("0") }
+    val takeImage = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.TakePicture()
+    ) { isSuccess ->
+        if (isSuccess) {
+            val bitmap = MediaStore.Images.Media.getBitmap(
+                context.contentResolver,
+                imageUri
+            )
+            imageBitmap = bitmap
+            usersImages.add(imageBitmap)
+        }
+    }
 
+
+    var sizeOfDefaultDataset by remember { mutableStateOf("0") }
+    fun createImageUri(context: Context): Uri {
+        val contentResolver = context.contentResolver
+        val contentValues = ContentValues().apply {
+            put(MediaStore.MediaColumns.DISPLAY_NAME, "img${System.currentTimeMillis()}.jpg")
+            put(MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
+        }
+        return contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)!!
+    }
     selectedImage?.let {
         if (isVisible) {
             BoxWithConstraints(
@@ -142,12 +158,25 @@ fun ModelInfo() {
             }
         }
     }
-
+    if (loading) {
+        BoxWithConstraints(modifier = Modifier
+            .size(200.dp)
+            .zIndex(1f), contentAlignment = Alignment.Center) {
+            ComposableProcessBar(
+                percentage = 1.0f, number = 100,
+                onAnimationEnd = {
+                    if (!it) {
+                        loading = false
+                        uploadComplete = "Upload complete"
+                    }
+                }
+            )
+        }
+    }
     Column(
         modifier = Modifier.background(color = WhiteColor)
     ) {
         ModelTopBackground()
-
         Box(
             modifier = Modifier
                 .height(40.dp)
@@ -160,10 +189,7 @@ fun ModelInfo() {
                 )
 
         ) {
-            Row(
-
-
-            ) {
+            Row {
                 Icon(
                     imageVector = Icons.Rounded.Circle,
                     contentDescription = "Model Info",
@@ -190,7 +216,7 @@ fun ModelInfo() {
                 .fillMaxWidth()
                 .shadow(2.dp, shape = RoundedCornerShape(10.dp))
         ) {
-            Column() {
+            Column {
                 Spacer(modifier = Modifier.height(6.dp))
                 Row(
                     modifier = Modifier.padding(start = 8.dp)
@@ -250,12 +276,11 @@ fun ModelInfo() {
                     )
                 }
             }
-
-
         }
 
 
         LazyRow {
+
             items(itemList) { item ->
                 Button(onClick = {},
                     modifier = Modifier.padding(start = 8.dp, top = 10.dp),
@@ -263,11 +288,17 @@ fun ModelInfo() {
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(text = item, color = Milk)
                 }
+
             }
+
         }
         Spacer(modifier = Modifier.height(20.dp))
+
         Row(
-            modifier = Modifier.padding(start = 8.dp)
+            modifier = Modifier
+                .padding(start = 8.dp)
+                .fillMaxWidth()
+
         ) {
             OutlinedTextField(
                 value = sizeOfDefaultDataset,
@@ -280,10 +311,16 @@ fun ModelInfo() {
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth(0.2f)
             )
-            Spacer(modifier = Modifier.weight(1f).fillMaxWidth())
+            Spacer(modifier = Modifier
+                .weight(1f)
+                .fillMaxWidth())
             Button(
+
                 onClick = {
-                    takePicturePreviewLauncher.launch(null)
+                    imageUri = createImageUri(context)
+                    imageUri.let{
+                        takeImage.launch(it)
+                    }
                 },
                 modifier = Modifier.padding( top = 10.dp, end = 12.dp),
 
@@ -296,22 +333,24 @@ fun ModelInfo() {
                     tint = Milk
                 )
             }
-        }
 
         if (imageBitmap != null) {
             bitmapList.add(imageBitmap)
             imageBitmap = null
+            }
         }
-        Row(
-            modifier = Modifier
-                .size(400.dp)
-                .padding(start = 8.dp, top = 10.dp, end = 12.dp, bottom = 10.dp)
-                .shadow(2.dp, shape = RoundedCornerShape(10.dp))
-        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth(1f)
+                    .fillMaxHeight(0.8f)
+                    .padding(start = 8.dp, top = 10.dp, end = 12.dp, bottom = 10.dp)
+                    .shadow(2.dp, shape = RoundedCornerShape(10.dp))
+                ) {
             bitmapList.forEach {
                 it?.asImageBitmap()?.let { bitmap ->
                     Image(bitmap = bitmap, contentDescription = "Image", modifier = Modifier
                         .padding(8.dp)
+                        .size(100.dp)
                         .clickable {
                             selectedImage = bitmap.asAndroidBitmap()
                             isVisible = true
@@ -320,11 +359,12 @@ fun ModelInfo() {
                 }
             }
         }
-
         Button(
             onClick = {
-                loading = true
-                uploadFunction(sizeOfDefaultDataset.toInt(), context)
+                if (isVisible) {
+                    loading = true
+                    uploadFunction(sizeOfDefaultDataset.toInt(), context)
+                }
             },
             Modifier
                 .fillMaxWidth()
@@ -332,7 +372,6 @@ fun ModelInfo() {
                 .padding(start = 64.dp, end = 64.dp, top = 8.dp, bottom = 8.dp),
             colors = ButtonDefaults.buttonColors(TextColor1),
             shape = RoundedCornerShape(50)
-
         ) {
             Text(text = "Upload")
         }
@@ -344,19 +383,6 @@ fun ModelInfo() {
             modifier = Modifier.padding(start = 8.dp)
         )
 
-    }
-    if (loading) {
-        Box(modifier = Modifier.size(200.dp).zIndex(1f), contentAlignment = Alignment.Center) {
-            ComposableProcessBar(
-                percentage = 1.0f, number = 100,
-                onAnimationEnd = {
-                    if (!it) {
-                        loading = false
-                        uploadComplete = "Upload complete"
-                    }
-                }
-            )
-        }
     }
 }
 

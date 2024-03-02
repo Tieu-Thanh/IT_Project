@@ -92,7 +92,7 @@ fun SignIn(navController: NavHostController) {
             color = TextColor1,
         )
         var email by remember { mutableStateOf("test.user@gmail.com") }
-        var password by remember { mutableStateOf("123456") }
+        var password by remember { mutableStateOf("021002ht") }
         var passwordVisible by rememberSaveable() { mutableStateOf(false) }
         val context = LocalContext.current
 
@@ -181,16 +181,16 @@ fun SignIn(navController: NavHostController) {
         )
         Button(
             onClick = {
-//                repo.signIn(email, password) {
-//                    if (it) {
-//                        user = email
-//                        repo.updateCurrentUser(user)
+                repo.signIn(email, password) {
+                    if (it) {
+                        user = email
+                        repo.updateCurrentUser(user)
                         navController.navigate("HomeScreen")
-//                        Toast.makeText(context, "Login Success", Toast.LENGTH_LONG).show()
-//                    } else {
-//                        Toast.makeText(context, "Login Failed", Toast.LENGTH_LONG).show()
-//                    }
-//                }
+                        Toast.makeText(context, "Login Success", Toast.LENGTH_LONG).show()
+                    } else {
+                        Toast.makeText(context, "Login Failed", Toast.LENGTH_LONG).show()
+                    }
+                }
             }, Modifier
                 .fillMaxWidth()
                 .height(66.dp)

@@ -1,6 +1,7 @@
 package com.example.loginui.API
 
 import com.example.loginui.BuildConfig
+import com.example.loginui.data.ListModelResponse
 import com.example.loginui.data.ModelResource
 import com.example.loginui.data.User
 import com.example.loginui.data.authen.SignInRequest
@@ -11,12 +12,12 @@ import retrofit2.http.Body
 import retrofit2.http.POST
 import retrofit2.Call
 import okhttp3.MultipartBody
-import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.http.GET
 import retrofit2.http.Multipart
 import retrofit2.http.Part
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 
 interface AuthService {
@@ -36,7 +37,7 @@ interface AuthService {
         fun uploadURL(@Body videoID:String,@Path("model_id") model_id:String): Call<ResponseBody>
 
         @GET("api/models")
-        fun getModelInfo(@Body body:String): Call<ResponseBody>
+        fun getModelList(@Query("user_id") field:String): Call<ListModelResponse>
 
         @POST("api/users")
         fun createStorage(@Body user_id:User): Call<ResponseBody>

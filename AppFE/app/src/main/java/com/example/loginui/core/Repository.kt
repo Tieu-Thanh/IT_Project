@@ -7,6 +7,7 @@ import android.graphics.Bitmap
 import android.util.Log
 import com.example.loginui.API.AuthService
 import com.example.loginui.BuildConfig
+import com.example.loginui.data.ListModelResponse
 import com.example.loginui.data.ModelResource
 import com.example.loginui.data.User
 
@@ -30,10 +31,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
-import java.time.Instant
 import java.time.LocalDate
-import java.util.Base64
-import kotlin.math.log
 
 class Repository {
 
@@ -59,11 +57,8 @@ class Repository {
         retrofit.create(AuthService::class.java)
     }
     fun createStorage(user_id:User, callback: (Boolean) -> Unit){
-
         apiService.createStorage(user_id).enqueue(object : Callback<ResponseBody>{
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
-                Log.d("11111111", "onResponse: ${response.code()}")
-                Log.d("1111111", "onResponse: ${response.body()}")
                 if(response.isSuccessful){
                     callback(true)
                 }
@@ -83,7 +78,8 @@ class Repository {
         .build()
     val apiService = uploadRetro.create(AuthService::class.java)
     fun postModelInfo(modelName: String,classes:List<String>,dataSize:Int, bitmaps: List<Bitmap>, context: Context){
-        val modelId = encodeObjectId(modelName+"cs:${classes.size}")
+        val modelId = generateId(modelName+"cs:${classes.size}")
+        println("modelId: $modelId created")
         val modelDetail = ModelResource(
             modelId,
             currentUser,
@@ -169,9 +165,6 @@ class Repository {
         return "$date-$modelName"
     }
 
-    private fun encodeObjectId(modelName: String): String {
-        return Base64.getEncoder().encodeToString(generateId(modelName).toByteArray())
-    }
     private fun createNotificationChannel(modelName: String, context: Context) {
         val channelId = "train"
         val channelName = "train_processing"
@@ -225,18 +218,21 @@ class Repository {
             MultipartBody.Part.createFormData("images", file.name, requestFile)
         }
     }
-    fun getModelList(callback: (List<ModelResource>) -> Unit){
-        apiService.getModelInfo(currentUser).enqueue(object : Callback<ResponseBody>{
-            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
-                if(response.isSuccessful){
-                    val modelList = response.body()?.string()
-                    println(modelList)
+    fun getModelList(listModelResponse: (ListModelResponse)->Unit){
+        Log.d("1111111", "getModelList: $currentUser")
+        apiService.getModelList(currentUser).enqueue(object : Callback<ListModelResponse> {
+            override fun onResponse(call: Call<ListModelResponse>, response: Response<ListModelResponse>) {
+                Log.d("11111111111111", "onResponse: ${response.body()}")
+                if (response.isSuccessful) {
+                    Log.d("11111", "onResponse: ")
+                    listModelResponse(response.body()!!)
                 }
             }
 
-            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                println("Error: ${t.message}")
+            override fun onFailure(call: Call<ListModelResponse>, t: Throwable) {
+                Log.d("TAG", "onFailure: ")
             }
+
         })
     }
 

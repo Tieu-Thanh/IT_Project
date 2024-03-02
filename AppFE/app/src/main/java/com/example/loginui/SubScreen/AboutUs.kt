@@ -1,14 +1,57 @@
 package com.example.loginui.SubScreen
 
-import androidx.compose.material3.Button
+import android.annotation.SuppressLint
+import android.util.Log
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
+import com.example.loginui.data.ModelResource
+import com.example.loginui.navigation.repo
 
+@SuppressLint("UnrememberedMutableState")
 @Composable
 fun About_us(navController: NavHostController){
+    val modelList = remember{mutableStateListOf<ModelResource>()}
     Text(text = "Your model")
-    Button(onClick = { navController.navigate("Check model") }) {
-        Text(text = "Your model")
+    repo.getModelList {
+        modelList.addAll(it.models)
+    }
+    ModelResourceList(modelList)
+    Log.d("11111111111", "About_us: $modelList")
+
+}
+
+@Composable
+fun ModelResourceList(modelResources: List<ModelResource>) {
+    LazyColumn {
+        items(modelResources) { modelResource ->
+            ModelResourceItem(modelResource)
+        }
+    }
+}
+
+@Composable
+fun ModelResourceItem(modelResource: ModelResource) {
+    Column(modifier = Modifier.padding(16.dp).clickable {
+
+    }
+    ) {
+        Text(text = "Model ID: ${modelResource.modelId}")
+        Text(text = "User ID: ${modelResource.userId}")
+        Text(text = "Model Name: ${modelResource.modelName}")
+        Text(text = "Classes: ${modelResource.classes.joinToString(", ")}")
+        Text(text = "Crawl Number: ${modelResource.crawlNumber}")
+        modelResource.createdAt?.let {
+            Text(text = "Created At: $it")
+        }
     }
 }

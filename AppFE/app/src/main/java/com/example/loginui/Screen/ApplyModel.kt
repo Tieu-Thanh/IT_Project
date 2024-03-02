@@ -34,7 +34,7 @@ import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.Abs
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
 
 @Composable
-fun UrlInputTextBox(navController: NavHostController) {
+fun UrlInputTextBox(navController: NavHostController,modelId:String) {
     val isClick = remember { mutableStateOf(false) }
     var videoUri by remember { mutableStateOf<Uri?>(null) }
     var videoReady by remember { mutableStateOf(false) }

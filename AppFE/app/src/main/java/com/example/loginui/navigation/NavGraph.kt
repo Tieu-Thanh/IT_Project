@@ -60,8 +60,10 @@ fun SetupNavGraph(navController: NavHostController) {
         composable("ModelInfo"){
             ModelInfo()
         }
-        composable("Check model"){
-            UrlInputTextBox(navController = navController)
+
+        composable("ApplyModel/{modelId}"){
+            backstackEntry->
+            UrlInputTextBox(navController = navController,modelId = backstackEntry.arguments?.getString("modelId")!!)
         }
     }
 }
