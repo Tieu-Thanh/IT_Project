@@ -53,7 +53,9 @@ class ModelResource(Resource):
 
     def get(self):
         try:
-            user_id = request.get_json()['user_id']
+            # user_id = request.get_json()['user_id']
+
+            user_id = request.args.get('user_id')
             models = Model.get_models_by_user_id(user_id)
             return {'models': models}, 201
         except Exception as e:
