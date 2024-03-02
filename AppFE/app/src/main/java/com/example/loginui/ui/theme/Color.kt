@@ -32,3 +32,5 @@ val JaipurStart = Color(0xFF9796f0)
 val JaipurEnd = Color(0xFFfbc7d4)
 
 val GoldSand = Color(0xFFDECBA4)
+val SpecCyan = Color(0xFF97D9E1)
+val SpecPink = Color(0xFFD9AFD9)
