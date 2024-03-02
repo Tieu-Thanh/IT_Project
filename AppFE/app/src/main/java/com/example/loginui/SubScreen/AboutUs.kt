@@ -22,7 +22,13 @@ import com.example.loginui.navigation.repo
 fun About_us(navController: NavHostController){
     val modelList = remember{mutableStateListOf<ModelResource>()}
     Text(text = "Your model")
-
+    LaunchedEffect(key1= true){
+        repo.updateModelList().let {
+            repo.setModel(it!!)
+        }
+        modelList.clear()
+        modelList.addAll(repo.getModelList().models)
+    }
     LazyColumn {
         items(modelList) { modelResource ->
             Column(modifier = Modifier
