@@ -2,6 +2,7 @@ package com.example.loginui.API
 
 import com.example.loginui.BuildConfig
 import com.example.loginui.data.ListModelResponse
+import com.example.loginui.data.Model
 import com.example.loginui.data.ModelResource
 import com.example.loginui.data.User
 import com.example.loginui.data.Video
@@ -42,6 +43,9 @@ interface AuthService {
         fun uploadVideo(@Body videoID:Video,@Path("model_id") model_id: String): Call<ResponseBody>
         @GET("api/models")
         fun getModelList(@Query("user_id") field:String): Call<ListModelResponse>
+
+        @POST
+        fun trainModel(@Body model_id: Model): Call<Void>
 
         @POST("api/users")
         fun createStorage(@Body user_id:User): Call<ResponseBody>

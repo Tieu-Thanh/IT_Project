@@ -54,7 +54,6 @@ fun UrlInputTextBox(navController: NavHostController,modelId:String) {
         Spacer(modifier = Modifier.height(6.dp))
         Row(
             modifier = Modifier.padding(start = 8.dp)
-
         ) {
             Icon(
                 imageVector = Icons.Rounded.Mail,
@@ -84,7 +83,7 @@ fun UrlInputTextBox(navController: NavHostController,modelId:String) {
                 tint = GoldSand
             )
             Text(
-                text = "Model: ${model.modelName}",
+                text = "Model: ${model.modelId}",
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 20.sp

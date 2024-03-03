@@ -10,5 +10,5 @@ data class ModelResource(
     val classes: List<String>,
     @SerializedName("crawl_number") val crawlNumber: Int,
     @SerializedName("created_at") var createdAt: String? = null,
-    @SerializedName("img_urls") val imgUrls: List<String?>? = null
+    @SerializedName("img_urls") val imgUrls: List<String?>? = null,
 )

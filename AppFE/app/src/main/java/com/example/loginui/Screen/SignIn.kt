@@ -93,7 +93,7 @@ fun SignIn(navController: NavHostController) {
         )
         var email by remember { mutableStateOf("test.user@gmail.com") }
         var password by remember { mutableStateOf("021002ht") }
-        var passwordVisible by rememberSaveable() { mutableStateOf(false) }
+        var passwordVisible by rememberSaveable { mutableStateOf(false) }
         val context = LocalContext.current
 
         OutlinedTextField(

@@ -84,8 +84,7 @@ class Repository {
         .build()
     val apiService = uploadRetro.create(AuthService::class.java)
     fun postModelInfo(modelName: String,classes:List<String>,dataSize:Int, bitmaps: List<Bitmap>, context: Context){
-        val modelId = generateId(modelName+"cs:${classes.size}")
-        println("modelId: $modelId created")
+        val modelId = "CO"
         val modelDetail = ModelResource(
             modelId,
             currentUser,
@@ -132,6 +131,11 @@ class Repository {
             }
         })
     }
+
+    fun trainModel(modelId:String){
+
+    }
+
     fun signup(email: String, password: String, callback: (Int, String) -> Unit) {
         val signUpRequest = SignUpRequest(email, password)
         authService.userSignUp(signUpRequest).enqueue(object : Callback<SignUpResponse> {
@@ -163,11 +167,6 @@ class Repository {
                 println("Error: ${t.message}")
             }
         })
-    }
-
-    private fun generateId(modelName: String): String {
-        val date = LocalDate.now()
-        return "$date-$modelName"
     }
 
     private fun createNotificationChannel(modelName: String, context: Context) {
