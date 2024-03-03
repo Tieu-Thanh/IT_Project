@@ -9,6 +9,7 @@ class Model:
         self.model_name = model_name
         self.classes = classes
         self.img_urls = img_urls
+        self.status = kwargs.get('status', 'newly created')
         self.accuracy = kwargs.get('accuracy', 0.0)
         self.crawl_number = kwargs.get('crawl_number', 10)  # number of images that to be crawled
         self.created_at = kwargs.get("created_at", datetime.now().strftime("%d/%m/%Y, %H:%M:%S"))
@@ -20,6 +21,7 @@ class Model:
             'model_name': self.model_name,
             'classes': self.classes,
             'img_urls': self.img_urls,
+            'status': self.status,
             'accuracy': self.accuracy,
             'crawl_number': self.crawl_number,
             'created_at': self.created_at
@@ -33,6 +35,7 @@ class Model:
             model_name=data['model_name'],
             classes=data['classes'],
             img_urls=data['img_urls'],
+            status=data['status'],
             accuracy=data['accuracy'],
             crawl_number=data['crawl_number'],
             created_at=data['created_at']
