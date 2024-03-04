@@ -50,12 +50,12 @@ class Model:
         db.collection('models').document(self.model_id).delete()
 
     @staticmethod
-    def save_images_to_url(user_id, model_name, images):
+    def save_images_to_url(user_id, model_id, images):
         img_urls = []
         for image in images:
             # Upload image to Firebase Storage
             bucket = storage.bucket()
-            blob = bucket.blob(f"{user_id}/{model_name}/images/" + image.filename)
+            blob = bucket.blob(f"{user_id}/{model_id}/images/" + image.filename)
 
             # Create BlobMetadata object and set content type based on filename
             blob.metadata = {'content_type': image.content_type}  # Set type

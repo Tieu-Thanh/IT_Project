@@ -36,7 +36,7 @@ class ModelResource(Resource):
 
         # Crawl images
         script_dir = os.path.dirname(os.path.abspath(__file__))  # Dynamically get the directory of the current script
-        img_folder = os.path.join(script_dir, "Images", f"{user_id}", f"{model_name}")
+        img_folder = os.path.join(script_dir, "Images", f"{user_id}", f"{model_id}")
 
         crawler = Crawler()
         images = crawler.crawl(classes, crawl_number)
@@ -101,7 +101,7 @@ class ModelImages(Resource):
             return {"message": "Model not found"}, 404
 
         # Upload images to Firebase Storage and get URLs
-        img_urls = Model.save_images_to_url(model.user_id, model.model_name, images)
+        img_urls = Model.save_images_to_url(model.user_id, model.model_id, images)
 
         # Update the model's img_urls attribute
         model.img_urls += img_urls  # Append new URLs to existing list
@@ -140,7 +140,7 @@ class ModelVideoResource(Resource):
             data = model_doc.to_dict()
             if video_file:
                 bucket = storage.bucket()
-                blob = bucket.blob(f"{data['user_id']}/{data['model_name']}/videos/"+video_file.filename)
+                blob = bucket.blob(f"{data['user_id']}/{data['model_id']}/videos/"+video_file.filename)
                 blob.upload_from_file(video_file.stream, content_type=video_file.content_type)
 
                 url = blob.public_url
