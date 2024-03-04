@@ -1,0 +1,16 @@
+/myvenv/
+/images/
+/.vscode/
+/UML
+/backend/.idea
+/api/*.json
+/env*
+/detection/data
+/detection/__pycache__
+/detection/Images
+/AuGen/Images
+/.idea
+/backend/blueprints/detection/Images
+**/__pycache__/
+/runs
+/detectron2
