@@ -8,7 +8,7 @@ from blueprints.api.models.Model import Model
 
 # example import
 
-# from blueprints.detection.yolo import Model_YOLO
+from blueprints.detection.yolo import Model_YOLO
 
 
 # helper functions
@@ -64,9 +64,6 @@ class YoloResource(Resource):
                 download_image_from_storage(url, local_path)
 
         # Train Model YOLO
-        # yolo = Model_YOLO()
-        # yolo.train(model.classes, input_folder=img_folder)
-
-        # return
-        return {'message': img_folder, 'data': model.to_dict(), 'model_images': model.img_urls}, 201
+        yolo = Model_YOLO()
+        yolo.train(model.classes, input_folder=img_folder,extension = '.jpg')
 

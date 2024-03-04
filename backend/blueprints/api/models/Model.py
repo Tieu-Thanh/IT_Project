@@ -9,7 +9,7 @@ class Model:
         self.model_name = model_name
         self.classes = classes
         self.img_urls = img_urls
-        self.status = kwargs.get('status', 'newly created')
+        self.status = kwargs.get('status', 'pending')
         self.accuracy = kwargs.get('accuracy', 0.0)
         self.crawl_number = kwargs.get('crawl_number', 10)  # number of images that to be crawled
         self.created_at = kwargs.get("created_at", datetime.now().strftime("%d/%m/%Y, %H:%M:%S"))

@@ -6,7 +6,7 @@ from flask_restful import Resource, reqparse
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from blueprints.api.models.Model import Model
 from blueprints.api.models.Crawler import Crawler
-
+import json
 
 class ModelResource(Resource):
     def __init__(self):
@@ -68,7 +68,22 @@ class ModelResource(Resource):
         except Exception as e:
             return {'message': str(e)}, 500
 
-
+    def send_push_notification(self,token, title, body):
+        config = json.load("config.json")
+        server_key = config['server_key']
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': 'key=' + server_key,
+        }
+        payload = {
+            'notification': {
+                'title': title,
+                'body': body
+            },
+            'to': token
+        }
+        response = requests.post('https://fcm.googleapis.com/fcm/send', json=json.dumbs(payload), headers=headers)
+        return response.json()
 class ModelDetailResource(Resource):
     def delete(self, model_id):
         try:
@@ -85,6 +100,7 @@ class ModelDetailResource(Resource):
         try:
             model = Model.get_model_detail(model_id)
             if model:
+
                 return {'model': model.to_dict()}, 201
             return {'message': 'Model not found'}, 404
 
