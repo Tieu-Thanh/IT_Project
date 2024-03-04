@@ -41,13 +41,12 @@ class YoloResource(Resource):
         # data-handling logic
         model = Model.get_model_detail(model_id)
         user_id = model.user_id
-        model_name = model.model_name
 
         # Get path
         # Dynamically get the directory of the current script
         script_dir = os.path.dirname(os.path.abspath(__file__))
         # Construct the img_folder path relative to the script location
-        img_folder = os.path.join(script_dir, "Images", f"{user_id}", f"{model_name}")
+        img_folder = os.path.join(script_dir, "Images", f"{user_id}", f"{model_id}")
 
         # Check dir exists
         if not os.path.exists(img_folder):
