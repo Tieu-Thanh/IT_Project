@@ -133,6 +133,7 @@ fun TextField() {
                         itemList.add(query)
                         ""
                     }
+                    query = ""
                 }
             },
             modifier = Modifier

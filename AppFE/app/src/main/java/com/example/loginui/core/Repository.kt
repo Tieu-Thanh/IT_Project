@@ -8,6 +8,7 @@ import android.util.Log
 import com.example.loginui.API.AuthService
 import com.example.loginui.BuildConfig
 import com.example.loginui.data.ListModelResponse
+import com.example.loginui.data.Model
 import com.example.loginui.data.ModelResource
 import com.example.loginui.data.User
 import com.example.loginui.data.Video
@@ -96,6 +97,11 @@ class Repository {
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                 if(response.isSuccessful){
                     println("Model Info Posted")
+                    if (bitmaps.isNotEmpty()) {
+                        postUserImage(bitmaps, context, modelDetail.modelId)
+                        println("Image Uploaded")
+                    }
+                    trainModel(modelDetail.modelId)
                 }
             }
 
@@ -105,8 +111,6 @@ class Repository {
             }
         })
         createNotificationChannel(modelId,context)
-        if (bitmaps.isNotEmpty())
-            postUserImage(bitmaps,context,modelDetail.modelId)
     }
 
     fun signIn(email:String,password:String,callback: (Boolean) -> Unit){
@@ -133,7 +137,18 @@ class Repository {
     }
 
     fun trainModel(modelId:String){
+        apiService.trainModel(Model(modelId)).enqueue(object : Callback<Void>{
+            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                if(response.isSuccessful){
+                    println("Model Training...")
+                }
+            }
 
+            override fun onFailure(call: Call<Void>, t: Throwable) {
+                println("Model Train Failed")
+                print(t.message)
+            }
+        })
     }
 
     fun signup(email: String, password: String, callback: (Int, String) -> Unit) {
