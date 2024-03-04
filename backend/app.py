@@ -1,3 +1,5 @@
+import os
+
 from flask import Flask
 import firebase_admin
 from firebase_admin import credentials, firestore, storage
@@ -19,7 +21,6 @@ db = firestore.client()
 
 # Storage bucket
 bucket = storage.bucket()
-
 
 # Register blueprint
 app.register_blueprint(model_api_bp, url_prefix='/api/models')

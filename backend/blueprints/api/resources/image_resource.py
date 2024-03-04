@@ -7,19 +7,29 @@ import uuid
 bucket = storage.bucket()  # Access the Firebase Storage bucket
 
 
+def download_image_from_storage(url, local_path):
+    try:
+        blob_name = url.replace("https://storage.googleapis.com/chuyen-de-nghien-cuu.appspot.com/", "")
+        # bucket = storage.bucket()
+
+        # create a blob obj
+        blob = bucket.blob(blob_name)
+
+        # download image
+        blob.download_to_filename(local_path)
+        print(f"Successfully downloaded {os.path.basename(local_path)}")
+    except Exception as e:
+        print(str(e))
+
+
 class ImageUpload(Resource):
     def post(self):
-        try:
-            # Define and parse request arguments
-            parser = reqparse.RequestParser()
-            parser.add_argument('image', type=reqparse.FileStorage, required=True, location='files')
-            args = parser.parse_args()
-
-            # Get the uploaded image file
-            file = args['image']
-
-        except Exception as e:
-            return {'error': str(e)}, 500
+        pass
+        # try:
+        #
+        #
+        # except Exception as e:
+        #     return {'error': str(e)}, 500
 
     def get(self):
         # Retrieve public URLs of all images in the bucket (modify as needed)

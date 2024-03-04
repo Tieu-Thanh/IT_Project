@@ -11,5 +11,7 @@
 /AuGen/Images
 /.idea
 /backend/blueprints/detection/Images
+/backend/blueprints/api/resources/Images
+
 **/__pycache__/
 

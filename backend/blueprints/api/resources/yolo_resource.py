@@ -2,13 +2,14 @@ import os
 from firebase_admin import storage
 from flask import request
 from flask_restful import Resource, reqparse
-from blueprints.detection.Temp import Temp  # example import
+
 from blueprints.api.models.Model import Model
 
 
-# from blueprints.detection.yolo import Model_YOLO
+# example import
 
 # from blueprints.detection.yolo import Model_YOLO
+
 
 # helper functions
 def download_image_from_storage(url, local_path):
@@ -43,8 +44,10 @@ class YoloResource(Resource):
         model_name = model.model_name
 
         # Get path
-        HOME = os.getcwd()
-        img_folder = os.path.join(HOME, "blueprints", "detection", "Images", f"{user_id}", f"{model_name}")
+        # Dynamically get the directory of the current script
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        # Construct the img_folder path relative to the script location
+        img_folder = os.path.join(script_dir, "Images", f"{user_id}", f"{model_name}")
 
         # Check dir exists
         if not os.path.exists(img_folder):
@@ -54,9 +57,9 @@ class YoloResource(Resource):
         urls = model.img_urls
         if len(urls) != 0:
             for url in urls:
-                filename = url.split("/")[-1]
-                # filename_without_extension, _ = os.path.splitext(filename_with_extension)
-                # filename = filename_without_extension + '.jpg'
+                filename_with_extension = url.split("/")[-1]
+                filename_without_extension, _ = os.path.splitext(filename_with_extension)
+                filename = filename_without_extension + '.jpg'
 
                 local_path = os.path.join(img_folder, filename)
                 download_image_from_storage(url, local_path)
@@ -66,4 +69,5 @@ class YoloResource(Resource):
         # yolo.train(model.classes, input_folder=img_folder)
 
         # return
-        return {'message': 'Hello', 'data': model.to_dict(), 'model_images': model.img_urls}, 201
+        return {'message': img_folder, 'data': model.to_dict(), 'model_images': model.img_urls}, 201
+

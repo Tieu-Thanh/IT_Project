@@ -35,10 +35,11 @@ class ModelResource(Resource):
         blob.upload_from_string('', content_type='text/plain')
 
         # Crawl images
+        script_dir = os.path.dirname(os.path.abspath(__file__))  # Dynamically get the directory of the current script
+        img_folder = os.path.join(script_dir, "Images", f"{user_id}", f"{model_name}")
+
         crawler = Crawler()
         images = crawler.crawl(classes, crawl_number)
-        HOME = os.getcwd()
-        img_folder = os.path.join(HOME, "blueprints", "detection", "Images", f"{user_id}", f"{model_name}")
         crawler.download_images(images, download_folder=img_folder)
 
         # creating a Model instance

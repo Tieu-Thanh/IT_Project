@@ -1,8 +1,8 @@
 from ultralytics import YOLO
 import os
-from autoannotate import Labeler
+from .autoannotate import Labeler
 import cv2
-from utils import draw_bbox
+from .utils import draw_bbox
 
 
 class Model_YOLO():
