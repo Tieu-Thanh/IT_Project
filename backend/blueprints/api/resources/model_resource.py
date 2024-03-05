@@ -1,4 +1,4 @@
-from firebase_admin import firestore, storage
+from firebase_admin import firestore, storage, messaging
 from flask import request
 import os
 import uuid
@@ -18,7 +18,7 @@ class ModelResource(Resource):
         self.parser.add_argument('crawl_number', type=int)
         self.parser.add_argument('accuracy', type=float)
         self.parser.add_argument('status', type=str, default='newly created')
-
+        self.parser.add_argument('token', type=str)
     def post(self):
         args = self.parser.parse_args()
         model_id = args['model_id']
@@ -28,10 +28,12 @@ class ModelResource(Resource):
         crawl_number = args['crawl_number']
         accuracy = args['accuracy']
         status = args['status']
-
+        token = args['token']
         # Create Storage folder
         bucket = storage.bucket()
-        blob = bucket.blob(f"{user_id}/{model_name}/.ignore")
+        size = self.folder_size(bucket, f"{user_id}") - 1
+        model_id = model_id + str(size)
+        blob = bucket.blob(f"{user_id}/{model_id}/.ignore")
         blob.upload_from_string('', content_type='text/plain')
 
         # Crawl images
@@ -54,10 +56,19 @@ class ModelResource(Resource):
             img_urls=[]  # This contains URLs from Firebase
         )
         model.save_to_db()
+        title = f"Model {model_id} created"
+        body = "Your model data has been created successfully, await to train"
 
+        print(self.send_notification_to_device(token,title, body))
+        return {'message': 'Model created successfully',
+                'model': model.to_dict()}, 201
         # Respond with success message and any relevant data
-        return {'message': 'Model created and images processed', 'model': model.to_dict()}, 201
-
+    def folder_size(self,bucket, folder_path)->int:
+        blobs = bucket.list_blobs(prefix= folder_path)
+        size = 0
+        for _ in blobs:
+            size += 1
+        return size
     def get(self):
         try:
             # user_id = request.get_json()['user_id']
@@ -68,22 +79,23 @@ class ModelResource(Resource):
         except Exception as e:
             return {'message': str(e)}, 500
 
-    def send_push_notification(self,token, title, body):
-        config = json.load("config.json")
-        server_key = config['server_key']
-        headers = {
-            'Content-Type': 'application/json',
-            'Authorization': 'key=' + server_key,
-        }
-        payload = {
-            'notification': {
-                'title': title,
-                'body': body
-            },
-            'to': token
-        }
-        response = requests.post('https://fcm.googleapis.com/fcm/send', json=json.dumbs(payload), headers=headers)
-        return response.json()
+    def send_notification_to_device(self, token, title, body):
+        # See documentation on defining a message payload at
+        # https://firebase.google.com/docs/cloud-messaging/admin/send-messages
+        message = messaging.Message(
+            notification=messaging.Notification(
+                title=title,
+                body=body,
+            ),
+            token=token,
+        )
+
+        # Send a message to the device corresponding to the provided
+        # registration token with the message payload.
+        response = messaging.send(message)
+        return response
+
+
 class ModelDetailResource(Resource):
     def delete(self, model_id):
         try:

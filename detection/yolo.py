@@ -17,7 +17,7 @@ class Model_YOLO():
 
     def _annotate_dataset(self, classes: list, input_folder: str, output_folder: str = None, extension: str = '.jpeg'):
         labeler = Labeler()
-        labeler.label_images(classes, input_folder)
+        labeler.label_images(classes, input_folder, output_folder, extension)
 
         output_folder = output_folder if output_folder else input_folder + '_labeled'
         data_yaml = os.path.join(output_folder, 'data.yaml')

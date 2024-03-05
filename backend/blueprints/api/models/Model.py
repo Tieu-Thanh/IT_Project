@@ -13,7 +13,6 @@ class Model:
         self.accuracy = kwargs.get('accuracy', 0.0)
         self.crawl_number = kwargs.get('crawl_number', 10)  # number of images that to be crawled
         self.created_at = kwargs.get("created_at", datetime.now().strftime("%d/%m/%Y, %H:%M:%S"))
-
     def to_dict(self):
         return {
             'model_id': self.model_id,
@@ -24,7 +23,7 @@ class Model:
             'status': self.status,
             'accuracy': self.accuracy,
             'crawl_number': self.crawl_number,
-            'created_at': self.created_at
+            'created_at': self.created_at,
         }
 
     @classmethod
@@ -38,7 +37,7 @@ class Model:
             status=data['status'],
             accuracy=data['accuracy'],
             crawl_number=data['crawl_number'],
-            created_at=data['created_at']
+            created_at=data['created_at'],
         )
 
     def save_to_db(self):
