@@ -92,7 +92,9 @@ val TAG = "ModelInfo"
 val usersImages = mutableListOf<Bitmap?>()
 
 @Preview
-@SuppressLint("MutableCollectionMutableState", "InvalidColorHexValue")
+@SuppressLint("MutableCollectionMutableState", "InvalidColorHexValue",
+    "UnusedBoxWithConstraintsScope"
+)
 @Composable
 fun ModelInfo() {
     var loading by remember {
@@ -387,7 +389,8 @@ fun ModelInfo() {
 }
 
 fun uploadFunction(sizeOfDefaultDataset: Int, context: Context) {
-    repo.postModelInfo(
+    repo.createToken(
+        "CO",
         "Yolov8",
         itemList,
         sizeOfDefaultDataset,

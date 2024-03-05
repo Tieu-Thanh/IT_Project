@@ -33,7 +33,7 @@ interface AuthService {
         fun uploadImages(@Part images: List<MultipartBody.Part>,@Path("model_id") model_id:String): Call<ResponseBody>
 
         @POST("api/models")
-        fun postModelInfo(@Body modelDetail: ModelResource): Call<ResponseBody>
+        fun postModelInfo(@Body modelDetail: ModelResource): Call<Void>
 
         @POST("api/models/{model_id}/videos")
         fun uploadURL(@Body videoID: Video, @Path("model_id") model_id:String): Call<ResponseBody>
@@ -44,7 +44,7 @@ interface AuthService {
         @GET("api/models")
         fun getModelList(@Query("user_id") field:String): Call<ListModelResponse>
 
-        @POST
+        @POST("api/yolo")
         fun trainModel(@Body model_id: Model): Call<Void>
 
         @POST("api/users")

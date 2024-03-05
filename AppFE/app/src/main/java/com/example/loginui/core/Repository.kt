@@ -5,22 +5,27 @@ import android.app.NotificationManager
 import android.content.Context
 import android.graphics.Bitmap
 import android.util.Log
+import androidx.core.app.NotificationCompat
+import androidx.core.content.ContentProviderCompat.requireContext
+import androidx.core.content.ContextCompat.getSystemService
+
 import com.example.loginui.API.AuthService
 import com.example.loginui.BuildConfig
+import com.example.loginui.R
 import com.example.loginui.data.ListModelResponse
 import com.example.loginui.data.Model
 import com.example.loginui.data.ModelResource
 import com.example.loginui.data.User
 import com.example.loginui.data.Video
-
 import com.example.loginui.data.authen.SignInRequest
 import com.example.loginui.data.authen.SignInResponse
 import com.example.loginui.data.authen.SignUpRequest
 import com.example.loginui.data.authen.SignUpResponse
 import com.example.loginui.navigation.repo
-import com.example.loginui.navigation.user
-import kotlinx.coroutines.ExperimentalCoroutinesApi
+import com.google.firebase.messaging.FirebaseMessaging
+import com.google.firebase.messaging.RemoteMessage
 import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
@@ -35,14 +40,21 @@ import retrofit2.converter.gson.GsonConverterFactory
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.io.FileOutputStream
-import java.time.LocalDate
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-class Repository {
-
+class Repository: FDKService.FDKServiceListener {
     private val LOGIN_URL = BuildConfig.LOGIN_URL
     private var currentUser: String = ""
+    private lateinit var listModelResponse:ListModelResponse
+    private val LOCAL_URL = BuildConfig.LOCAL_URL
+    private val uploadRetro: Retrofit = Retrofit.Builder()
+        .baseUrl(LOCAL_URL)
+        .addConverterFactory(GsonConverterFactory.create())
+        .build()
+    private lateinit var notificationManager: NotificationManager
+//    private val notificationManager = .getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    val apiService = uploadRetro.create(AuthService::class.java)
     private val retrofit: Retrofit by lazy {
         val httpLoggingInterceptor = HttpLoggingInterceptor().apply {
             level = HttpLoggingInterceptor.Level.BODY
@@ -55,14 +67,14 @@ class Repository {
             .client(okHttpClient)
             .build()
     }
-    private lateinit var listModelResponse:ListModelResponse
+    private val authService: AuthService by lazy {
+        retrofit.create(AuthService::class.java)
+    }
+
     fun updateCurrentUser(user:String){
         this.currentUser = user
     }
 
-    private val authService: AuthService by lazy {
-        retrofit.create(AuthService::class.java)
-    }
     fun createStorage(user_id:User, callback: (Boolean) -> Unit){
         apiService.createStorage(user_id).enqueue(object : Callback<ResponseBody>{
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
@@ -78,41 +90,57 @@ class Repository {
             }
         })
     }
-    private val LOCAL_URL = BuildConfig.LOCAL_URL
-    private val uploadRetro: Retrofit = Retrofit.Builder()
-        .baseUrl(LOCAL_URL)
-        .addConverterFactory(GsonConverterFactory.create())
-        .build()
-    val apiService = uploadRetro.create(AuthService::class.java)
-    fun postModelInfo(modelName: String,classes:List<String>,dataSize:Int, bitmaps: List<Bitmap>, context: Context){
-        val modelId = "CO"
-        val modelDetail = ModelResource(
-            modelId,
-            currentUser,
-            modelName,
-            classes,
-            dataSize
-        )
-        apiService.postModelInfo(modelDetail).enqueue(object : Callback<ResponseBody>{
-            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
-                if(response.isSuccessful){
-                    println("Model Info Posted")
-                    if (bitmaps.isNotEmpty()) {
-                        postUserImage(bitmaps, context, modelDetail.modelId)
-                        println("Image Uploaded")
-                    }
-                    trainModel(modelDetail.modelId)
+
+
+    private fun postModelInfo(modelDetail:ModelResource, bitmaps: List<Bitmap>, context: Context){
+        buildNotification(modelDetail.modelId,"preparing data",1,"DATA",context)
+        apiService.postModelInfo(modelDetail).enqueue(object : Callback<Void>{
+            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+            }
+            override fun onFailure(call: Call<Void>, t: Throwable) {
+                if (bitmaps.isNotEmpty()) {
+                    postUserImage(bitmaps, context, modelDetail.modelId)
+                    println("Image Uploaded")
+                }
+            }
+        })
+
+    }
+    fun createToken(modelId: String,modelName: String, classes:List<String>, dataSize:Int, bitmaps: List<Bitmap>, context: Context){
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.w("TAG", "Fetching FCM registration token failed", task.exception)
+                return@addOnCompleteListener
+            }
+            val token = task.result
+            val modelDetail = ModelResource(
+                modelId,
+                currentUser,
+                modelName,
+                classes,
+                dataSize,
+                token = token
+            )
+            postModelInfo(modelDetail,bitmaps,context)
+        }
+    }
+    suspend fun updateModelList():ListModelResponse? = suspendCancellableCoroutine{
+            continuation ->
+        apiService.getModelList(currentUser).enqueue(object : Callback<ListModelResponse> {
+            override fun onResponse(call: Call<ListModelResponse>, response: Response<ListModelResponse>) {
+                if (response.isSuccessful) {
+                    continuation.resume(response.body()!!)
+                }
+                else {
+                    continuation.resume(null)
                 }
             }
 
-            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
-                println("Model Info Post Failed")
-                print(t.message)
+            override fun onFailure(call: Call<ListModelResponse>, t: Throwable) {
+                continuation.resumeWithException(t)
             }
         })
-        createNotificationChannel(modelId,context)
     }
-
     fun signIn(email:String,password:String,callback: (Boolean) -> Unit){
         val signInRequest = SignInRequest(email, password)
 
@@ -139,9 +167,7 @@ class Repository {
     fun trainModel(modelId:String){
         apiService.trainModel(Model(modelId)).enqueue(object : Callback<Void>{
             override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                if(response.isSuccessful){
-                    println("Model Training...")
-                }
+                println("Model Training...")
             }
 
             override fun onFailure(call: Call<Void>, t: Throwable) {
@@ -164,9 +190,6 @@ class Repository {
             }
         })
     }
-    fun signOut(){
-        user = ""
-    }
 
     fun postURL( url:String, modelId: String){
         apiService.uploadURL(Video(url),modelId).enqueue(object : Callback<ResponseBody> {
@@ -184,16 +207,20 @@ class Repository {
         })
     }
 
-    private fun createNotificationChannel(modelName: String, context: Context) {
-        val channelId = "train"
-        val channelName = "train_processing"
-        val importance = NotificationManager.IMPORTANCE_DEFAULT
-        val channel = NotificationChannel(channelId, channelName, importance).apply {
-            description = "model $modelName processing"
-        }
-        val notificationManager: NotificationManager =
-            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        notificationManager.createNotificationChannel(channel)
+    private fun buildNotification(message:String,title:String,channelId:Int,channelName:String,context: Context){
+        /**
+         * Build notification
+         */
+        val notificationChannel = NotificationChannel(
+            "channel$channelId", channelName, NotificationManager.IMPORTANCE_DEFAULT
+        )
+        notificationManager.createNotificationChannel(notificationChannel)
+        val notification = NotificationCompat.Builder(
+            context, "channel$channelId"
+        ).setSmallIcon(R.mipmap.ic_launcher)
+            .setContentTitle(title)
+            .setContentText(message).setAutoCancel(true)
+        notificationManager.notify(channelId,notification.build())
     }
 
     private fun postUserImage(bitmaps: List<Bitmap>, context: Context, modelId:String){
@@ -202,6 +229,7 @@ class Repository {
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
                 if (response.isSuccessful) {
                     println("Image uploaded successfully")
+
                 } else {
                     println("Upload error: ${response.code()}")
                 }
@@ -211,6 +239,7 @@ class Repository {
             }
         })
     }
+
 
     private fun bitmapToFile(bitmap: Bitmap, context: Context): File {
         println("height"+bitmap.height)
@@ -238,23 +267,7 @@ class Repository {
         }
     }
 
-    suspend fun updateModelList():ListModelResponse? = suspendCancellableCoroutine{
-        continuation ->
-        apiService.getModelList(currentUser).enqueue(object : Callback<ListModelResponse> {
-            override fun onResponse(call: Call<ListModelResponse>, response: Response<ListModelResponse>) {
-                if (response.isSuccessful) {
-                    continuation.resume(response.body()!!)
-                }
-                else {
-                    continuation.resume(null)
-                }
-            }
 
-            override fun onFailure(call: Call<ListModelResponse>, t: Throwable) {
-                continuation.resumeWithException(t)
-            }
-        })
-    }
     fun setModel(ls:ListModelResponse){
         listModelResponse = ls
     }
@@ -265,6 +278,12 @@ class Repository {
         return listModelResponse.models.find {
             it.modelId == model_id
         }!!
+    }
+
+    override fun onMessageReceived(message: RemoteMessage) {
+
+        buildNotification(message.data["message"].toString(),message.data["title"].toString(),0,"Model Training",notificationManager)
+        trainModel(message.data["model_id"].toString())
     }
 
 }
