@@ -7,6 +7,23 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from blueprints.api.models.Model import Model
 from blueprints.api.models.Crawler import Crawler
 import json
+from blueprints.detection.yolo import Model_YOLO
+
+def send_notification_to_device(token, title, body):
+    # See documentation on defining a message payload at
+    # https://firebase.google.com/docs/cloud-messaging/admin/send-messages
+    message = messaging.Message(
+        notification=messaging.Notification(
+            title=title,
+            body=body,
+        ),
+        token=token,
+    )
+
+    # Send a message to the device corresponding to the provided
+    # registration token with the message payload.
+    response = messaging.send(message)
+    return response
 
 class ModelResource(Resource):
     def __init__(self):
@@ -16,8 +33,6 @@ class ModelResource(Resource):
         self.parser.add_argument('model_name', type=str)
         self.parser.add_argument('classes', type=str, action='append')
         self.parser.add_argument('crawl_number', type=int)
-        self.parser.add_argument('accuracy', type=float)
-        self.parser.add_argument('status', type=str, default='newly created')
         self.parser.add_argument('token', type=str)
     def post(self):
         args = self.parser.parse_args()
@@ -26,9 +41,8 @@ class ModelResource(Resource):
         model_name = args['model_name']
         classes = args['classes']
         crawl_number = args['crawl_number']
-        accuracy = args['accuracy']
-        status = args['status']
         token = args['token']
+
         # Create Storage folder
         bucket = storage.bucket()
         size = self.folder_size(bucket, f"{user_id}") - 1
@@ -51,15 +65,14 @@ class ModelResource(Resource):
             model_name=model_name,
             classes=classes,
             crawl_number=crawl_number,
-            status=status,
-            accuracy=accuracy,
+            status=1,
             img_urls=[]  # This contains URLs from Firebase
         )
         model.save_to_db()
-        title = f"Model {model_id} created"
+        title = f"{model.status}.{model_id} created"
         body = "Your model data has been created successfully, await to train"
 
-        print(self.send_notification_to_device(token,title, body))
+        print(send_notification_to_device(token,title, body))
         return {'message': 'Model created successfully',
                 'model': model.to_dict()}, 201
         # Respond with success message and any relevant data
@@ -79,21 +92,6 @@ class ModelResource(Resource):
         except Exception as e:
             return {'message': str(e)}, 500
 
-    def send_notification_to_device(self, token, title, body):
-        # See documentation on defining a message payload at
-        # https://firebase.google.com/docs/cloud-messaging/admin/send-messages
-        message = messaging.Message(
-            notification=messaging.Notification(
-                title=title,
-                body=body,
-            ),
-            token=token,
-        )
-
-        # Send a message to the device corresponding to the provided
-        # registration token with the message payload.
-        response = messaging.send(message)
-        return response
 
 
 class ModelDetailResource(Resource):
@@ -167,11 +165,7 @@ class ModelVideoResource(Resource):
             # upload video if video is provided
             data = model_doc.to_dict()
             if video_file:
-                bucket = storage.bucket()
-                blob = bucket.blob(f"{data['user_id']}/{data['model_id']}/videos/"+video_file.filename)
-                blob.upload_from_file(video_file.stream, content_type=video_file.content_type)
-
-                url = blob.public_url
+                self.uploadVideo("videos",video_file,data)
 
             video_doc = model_ref.collection('videos').document(video_id)
             video_doc.set({
@@ -180,7 +174,29 @@ class ModelVideoResource(Resource):
             )
 
             video_data = video_doc.get().to_dict()
+            self.detect_video(model_id,video_data)
             return {"message": "Video saved successfully",
                     "video": video_data}, 201
         except Exception as e:
             return {"message": str(e)}, 500
+    def detect_video(self, model_id,video_data):
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        # Construct the img_folder path relative to the script location
+        model_folder = os.path.join(script_dir, "Images", f"{user_id}", f"{model_id}_model")
+        model_file = os.path.join(model_folder,"train","weights","best.pt")
+
+        if not os.path.exists(model_file):
+            return {"message": "Model not found"}, 404
+        yolo = Model_YOLO(model_file)
+        result = yolo.detect(video_data['url'])
+
+        video_result = os.path.join(model_folder, "detection_result", f"{video_data['video_id']}.mp4")
+        result.save(video_result)
+        self.uploadVideo("detection_result",video_result,video_data)
+        send_notification_to_device(model.token,f"{4}.{model_id} status","Video detected successfully")
+        return {"message": "Video detected successfully"}, 200
+    def uploadVideo(self,folder_type,video_file,data):
+        bucket = storage.bucket()
+        blob = bucket.blob(f"{data['user_id']}/{data['model_id']}/{folder_type}/"+video_file.filename)
+        blob.upload_from_file(video_file.stream, content_type=video_file.content_type)
+        url = blob.public_url

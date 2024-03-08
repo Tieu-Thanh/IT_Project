@@ -3,7 +3,7 @@ from autodistill.detection import CaptionOntology
 import argparse
 
 '''
-Usage:          python auoto-annotate.py    --classes ['banana','orange']\
+Usage:          python auto-annotate.py    --classes ['banana','orange']\
                                             --input_folder path/to/images
 '''
 

@@ -9,7 +9,7 @@ class Model:
         self.model_name = model_name
         self.classes = classes
         self.img_urls = img_urls
-        self.status = kwargs.get('status', 'pending')
+        self.status = kwargs.get('status', 0)
         self.accuracy = kwargs.get('accuracy', 0.0)
         self.crawl_number = kwargs.get('crawl_number', 10)  # number of images that to be crawled
         self.created_at = kwargs.get("created_at", datetime.now().strftime("%d/%m/%Y, %H:%M:%S"))
@@ -47,6 +47,13 @@ class Model:
     def delete_from_db(self):
         db = firestore.client()
         db.collection('models').document(self.model_id).delete()
+
+    def update_status(self, new_status):
+        """Update the model's status in Firestore."""
+        db = firestore.client()
+        self.status = new_status
+        model_ref = db.collection('models').document(self.model_id)
+        model_ref.update({'status': new_status})
 
     @staticmethod
     def save_images_to_url(user_id, model_id, images):
