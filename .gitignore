@@ -15,3 +15,6 @@
 
 **/__pycache__/
 
+**/__pycache__/
+/runs
+/detectron2
