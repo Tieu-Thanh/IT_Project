@@ -143,7 +143,17 @@ fun UrlInputTextBox(navController: NavHostController,modelId:String) {
 
             Button(
                 onClick = {
-                    repo.postURL(url,modelId)
+                   if (videoUri != null) {
+                       Log.d(TAG, "uri case: $videoUri")
+                       repo.postVideo(videoUri!!, modelId,null)
+                   }
+                   else{
+                       Log.d(TAG, "url case: $url")
+                       Log.d(TAG, "UrlInputTextBox: $modelId")
+                      repo.postVideo(null, modelId, url)
+                       url=""
+                   }
+                    videoReady = false
                 },
                 enabled = videoReady
             ) {
@@ -157,14 +167,15 @@ fun UrlInputTextBox(navController: NavHostController,modelId:String) {
                 }
             )
 
-            Button(onClick = { pickVideoLauncher.launch("video/*") }) {
+            Button(onClick = { pickVideoLauncher.launch("video/*")
+
+            }) {
                 Text("Pick Video")
             }
             if(isClick.value){
                 VideoPlayer(Uri.parse(url)){
                     videoReady = it
                 }
-                url = ""
             }
             if (videoUri != null) {
                 VideoPlayer(videoUri!!){
@@ -184,7 +195,6 @@ fun VideoPlayer(uri: Uri, videoReady:(Boolean)->Unit) {
     val validYoutube = listOf("youtube.com", "youtu.be")
     var isYoutubeLink = false
     val localLifeCycle = LocalLifecycleOwner.current
-    Log.d(TAG, "VideoPlayer: $uri")
     AndroidView(
         modifier = Modifier.fillMaxWidth(),
         factory = { context ->
@@ -230,4 +240,5 @@ fun extractYouTubeVideoIdFromShortUrl(url: String): String {
     val path = url.substringAfter("youtu.be/").substringAfter("watch?v=")
     return path.substringBefore('?').substringBefore('&')
 }
+
 fun String.isValidUrl(): Boolean = this.isNotEmpty() && android.util.Patterns.WEB_URL.matcher(this).matches()

@@ -15,7 +15,7 @@ import com.example.loginui.Screen.ModelInfo
 import com.example.loginui.Screen.SignIn
 import com.example.loginui.Screen.SignUp
 import com.example.loginui.Screen.UrlInputTextBox
-import com.example.loginui.SubScreen.About_us
+import com.example.loginui.SubScreen.UserModels
 import com.example.loginui.SubScreen.Contact_us
 import com.example.loginui.SubScreen.News
 
@@ -43,7 +43,7 @@ fun SetupNavGraph(navController: NavHostController) {
             Contact_us(navController = navController)
         }
         composable("Your model") {
-            About_us(navController = navController)
+            UserModels(navController = navController)
         }
         composable("HomeScreen") {
             HomeScreen(navController = navController)
@@ -60,7 +60,6 @@ fun SetupNavGraph(navController: NavHostController) {
         composable("ModelInfo"){
             ModelInfo()
         }
-
         composable("ApplyModel/{modelId}"){
             backstackEntry->
             UrlInputTextBox(navController = navController,modelId = backstackEntry.arguments?.getString("modelId")!!)

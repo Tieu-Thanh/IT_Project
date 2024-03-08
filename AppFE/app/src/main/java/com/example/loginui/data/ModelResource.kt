@@ -12,4 +12,6 @@ data class ModelResource(
     @SerializedName("created_at") var createdAt: String? = null,
     @SerializedName("img_urls") val imgUrls: List<String?>? = null,
     @SerializedName("token") val token: String,
+    @SerializedName("status") val status: Int? = 0,
+    @SerializedName("accuracy") val accuracy: Float? = 0.0f
 )

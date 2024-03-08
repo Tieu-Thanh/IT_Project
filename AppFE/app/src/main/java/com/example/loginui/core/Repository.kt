@@ -1,35 +1,27 @@
 package com.example.loginui.core
 
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.content.Context
 import android.graphics.Bitmap
+import android.net.Uri
 import android.util.Log
-import androidx.core.app.NotificationCompat
-import androidx.core.content.ContentProviderCompat.requireContext
-import androidx.core.content.ContextCompat.getSystemService
-
 import com.example.loginui.API.AuthService
 import com.example.loginui.BuildConfig
-import com.example.loginui.R
 import com.example.loginui.data.ListModelResponse
 import com.example.loginui.data.Model
 import com.example.loginui.data.ModelResource
 import com.example.loginui.data.User
-import com.example.loginui.data.Video
 import com.example.loginui.data.authen.SignInRequest
 import com.example.loginui.data.authen.SignInResponse
 import com.example.loginui.data.authen.SignUpRequest
 import com.example.loginui.data.authen.SignUpResponse
 import com.example.loginui.navigation.repo
 import com.google.firebase.messaging.FirebaseMessaging
-import com.google.firebase.messaging.RemoteMessage
 import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlinx.coroutines.withContext
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody.Companion.asRequestBody
+import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.ResponseBody
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Call
@@ -43,17 +35,21 @@ import java.io.FileOutputStream
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 
-class Repository: FDKService.FDKServiceListener {
+
+class Repository  {
     private val LOGIN_URL = BuildConfig.LOGIN_URL
     private var currentUser: String = ""
     private lateinit var listModelResponse:ListModelResponse
     private val LOCAL_URL = BuildConfig.LOCAL_URL
+    val logging = HttpLoggingInterceptor().setLevel(HttpLoggingInterceptor.Level.BODY)
+    val client = OkHttpClient.Builder()
+        .addInterceptor(logging)
+        .build()
     private val uploadRetro: Retrofit = Retrofit.Builder()
-        .baseUrl(LOCAL_URL)
+        .baseUrl(LOCAL_URL).client(client)
         .addConverterFactory(GsonConverterFactory.create())
         .build()
-    private lateinit var notificationManager: NotificationManager
-//    private val notificationManager = .getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
     val apiService = uploadRetro.create(AuthService::class.java)
     private val retrofit: Retrofit by lazy {
         val httpLoggingInterceptor = HttpLoggingInterceptor().apply {
@@ -67,6 +63,7 @@ class Repository: FDKService.FDKServiceListener {
             .client(okHttpClient)
             .build()
     }
+
     private val authService: AuthService by lazy {
         retrofit.create(AuthService::class.java)
     }
@@ -93,7 +90,7 @@ class Repository: FDKService.FDKServiceListener {
 
 
     private fun postModelInfo(modelDetail:ModelResource, bitmaps: List<Bitmap>, context: Context){
-        buildNotification(modelDetail.modelId,"preparing data",1,"DATA",context)
+
         apiService.postModelInfo(modelDetail).enqueue(object : Callback<Void>{
             override fun onResponse(call: Call<Void>, response: Response<Void>) {
             }
@@ -167,7 +164,12 @@ class Repository: FDKService.FDKServiceListener {
     fun trainModel(modelId:String){
         apiService.trainModel(Model(modelId)).enqueue(object : Callback<Void>{
             override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                println("Model Training...")
+                if(response.isSuccessful){
+                    println("Model is training...")
+                }
+                else{
+                    println("Model Train Failed")
+                }
             }
 
             override fun onFailure(call: Call<Void>, t: Throwable) {
@@ -191,37 +193,32 @@ class Repository: FDKService.FDKServiceListener {
         })
     }
 
-    fun postURL( url:String, modelId: String){
-        apiService.uploadURL(Video(url),modelId).enqueue(object : Callback<ResponseBody> {
-            override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
-                if (response.isSuccessful) {
-                    println("URL uploaded successfully")
-                } else {
-                    println("Upload error: ${response.code()}")
+    fun postVideo(uri: Uri?,modelId: String,url:String?){
+        val path = if (uri != null) {
+            val file = File(uri.path!!)
+            val requestBody = file.asRequestBody("video/*".toMediaTypeOrNull())
+            MultipartBody.Part.createFormData("file", file.name, requestBody)
+        } else {
+            null
+        }
+        val textBody = url?.toRequestBody("text/plain".toMediaTypeOrNull())
+        apiService.uploadVideo(path,url = textBody, model_id = modelId).enqueue(object :Callback<Void>{
+            override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                if(response.isSuccessful){
+                    println("Video uploaded successfully")
+                }
+                else{
+                    println("Upload error: ${response.message()}")
                 }
             }
 
-            override fun onFailure(call: Call<ResponseBody>, t: Throwable) {
+            override fun onFailure(call: Call<Void>, t: Throwable) {
                 println("Error: ${t.message}")
             }
+
         })
     }
 
-    private fun buildNotification(message:String,title:String,channelId:Int,channelName:String,context: Context){
-        /**
-         * Build notification
-         */
-        val notificationChannel = NotificationChannel(
-            "channel$channelId", channelName, NotificationManager.IMPORTANCE_DEFAULT
-        )
-        notificationManager.createNotificationChannel(notificationChannel)
-        val notification = NotificationCompat.Builder(
-            context, "channel$channelId"
-        ).setSmallIcon(R.mipmap.ic_launcher)
-            .setContentTitle(title)
-            .setContentText(message).setAutoCancel(true)
-        notificationManager.notify(channelId,notification.build())
-    }
 
     private fun postUserImage(bitmaps: List<Bitmap>, context: Context, modelId:String){
         val imagesParts = prepareImagesParts(bitmaps, context)
@@ -242,8 +239,6 @@ class Repository: FDKService.FDKServiceListener {
 
 
     private fun bitmapToFile(bitmap: Bitmap, context: Context): File {
-        println("height"+bitmap.height)
-        println("width"+bitmap.width)
         val file = File(context.cacheDir, "user_image${System.currentTimeMillis()}.jpg") // Tạo file tạm thời
         file.createNewFile()
 
@@ -280,10 +275,6 @@ class Repository: FDKService.FDKServiceListener {
         }!!
     }
 
-    override fun onMessageReceived(message: RemoteMessage) {
 
-        buildNotification(message.data["message"].toString(),message.data["title"].toString(),0,"Model Training",notificationManager)
-        trainModel(message.data["model_id"].toString())
-    }
 
 }
