@@ -147,7 +147,8 @@ class ModelVideoResource(Resource):
     def post(self, model_id):
         url = request.form.get('url')
         video_file = request.files.get('video')
-
+        token = request.get('token')
+        
         if not url and not video_file:
             return {"message": "No url provided or video provided"}, 400
 
@@ -168,7 +169,7 @@ class ModelVideoResource(Resource):
             )
 
             video_data = video_doc.get().to_dict()
-            response = self.detect_video(model_data=model.to_dict(), video_data=video_data)
+            response = self.detect_video(token=token, model_data=model.to_dict(), video_data=video_data)
 
             return {"message": "Video saved successfully",
                     "video": video_data,
@@ -176,7 +177,7 @@ class ModelVideoResource(Resource):
         except Exception as e:
             return {"message": str(e)}, 500
 
-    def detect_video(self, model_data, video_data):
+    def detect_video(self, token, model_data, video_data):
         # resources/Images/{user_id}/{model_id}
         script_dir = os.path.dirname(os.path.abspath(__file__))
         model_folder = os.path.join(script_dir,
@@ -187,7 +188,9 @@ class ModelVideoResource(Resource):
 
         # Create path
         if not os.path.exists(model_file):
-            os.makedirs(model_file, exist_ok=True)
+            # os.makedirs(model_file, exist_ok=True)
+            return  {"error": "Model file does not exists"}, 404
+            
 
         yolo = Model_YOLO(model_file)
         result = yolo.detect(video_data['url'])
@@ -196,7 +199,7 @@ class ModelVideoResource(Resource):
         result.save(video_result)
         self.uploadVideo("detection_result", video_result, video_data)
 
-        response = send_notification_to_device(model.token,
+        response = send_notification_to_device(token,
                                                f"{4}.{model_data['model_id']} status",
                                                "Video detected successfully")
         return response
