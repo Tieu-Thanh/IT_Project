@@ -13,6 +13,7 @@ class Model:
         self.accuracy = kwargs.get('accuracy', 0.0)
         self.crawl_number = kwargs.get('crawl_number', 10)  # number of images that to be crawled
         self.created_at = kwargs.get("created_at", datetime.now().strftime("%d/%m/%Y, %H:%M:%S"))
+
     def to_dict(self):
         return {
             'model_id': self.model_id,
@@ -91,3 +92,8 @@ class Model:
 
         model_data = model_doc.to_dict()
         return Model.from_dict(model_data)
+
+    def get_video_ref(self, video_id):
+        db = firestore.client()
+        video_ref = db.collection('models').document(self.model_id).collection('videos').document(video_id)
+        return video_ref

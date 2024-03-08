@@ -3,35 +3,39 @@ import os
 from flask import Flask
 import firebase_admin
 from firebase_admin import credentials, firestore, storage
-
+from utils.extensions import db, bucket
+from config import Config
+from utils.celery_utils import make_celery
 from blueprints.api.views.model_api import model_api_bp
 from blueprints.api.views.user_api import user_api_bp
 from blueprints.api.views.yolo_api import yolo_api_bp
-
-app = Flask(__name__)
-
-# Initialize Firebase Admin
-cred = credentials.Certificate('key.json')
-firebase_admin.initialize_app(cred, {
-    'storageBucket': 'chuyen-de-nghien-cuu.appspot.com'
-})
-
-# Firestore database client
-db = firestore.client()
-
-# Storage bucket
-bucket = storage.bucket()
-
-# Register blueprint
-app.register_blueprint(model_api_bp, url_prefix='/api/models')
-app.register_blueprint(user_api_bp, url_prefix='/api/users')
-app.register_blueprint(yolo_api_bp, url_prefix='/api/yolo')
+from celery import Celery
 
 
-@app.route('/')
-def hello_world():
-    return 'Hello World!'
+def create_app():
+    app = Flask(__name__)
+    app.config.from_object(Config)
 
+    celery = make_celery(app)
+
+    # Register blueprint
+    app.register_blueprint(model_api_bp, url_prefix='/api/models')
+    app.register_blueprint(user_api_bp, url_prefix='/api/users')
+    app.register_blueprint(yolo_api_bp, url_prefix='/api/yolo')
+
+    @app.route('/')
+    def hello_world():
+        return 'Hello, World!'
+
+    print(app.config['CELERY_BROKER_URL'])
+    print(app.config['CELERY_RESULT_BACKEND'])
+    print('Celery Broker URL:', celery.conf.broker_url)
+
+    return app, celery
+
+
+app, celery = create_app()
 
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=5000, debug=True)
+

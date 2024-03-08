@@ -9,3 +9,7 @@ flask-restful
 firebase-admin
 python-decouple
 requests
+roboflow
+ultralytics
+autodistill_grounded_sam
+celery

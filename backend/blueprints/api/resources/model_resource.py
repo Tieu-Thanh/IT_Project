@@ -9,6 +9,7 @@ from blueprints.api.models.Crawler import Crawler
 import json
 from blueprints.detection.yolo import Model_YOLO
 
+
 def send_notification_to_device(token, title, body):
     # See documentation on defining a message payload at
     # https://firebase.google.com/docs/cloud-messaging/admin/send-messages
@@ -25,6 +26,7 @@ def send_notification_to_device(token, title, body):
     response = messaging.send(message)
     return response
 
+
 class ModelResource(Resource):
     def __init__(self):
         self.parser = reqparse.RequestParser()
@@ -34,6 +36,7 @@ class ModelResource(Resource):
         self.parser.add_argument('classes', type=str, action='append')
         self.parser.add_argument('crawl_number', type=int)
         self.parser.add_argument('token', type=str)
+
     def post(self):
         args = self.parser.parse_args()
         model_id = args['model_id']
@@ -52,6 +55,7 @@ class ModelResource(Resource):
 
         # Crawl images
         script_dir = os.path.dirname(os.path.abspath(__file__))  # Dynamically get the directory of the current script
+        script_dir = r"D:\Workspace\IT_Project\backend\blueprints\detection"
         img_folder = os.path.join(script_dir, "Images", f"{user_id}", f"{model_id}")
 
         crawler = Crawler()
@@ -72,16 +76,18 @@ class ModelResource(Resource):
         title = f"{model.status}.{model_id} created"
         body = "Your model data has been created successfully, await to train"
 
-        print(send_notification_to_device(token,title, body))
+        print(send_notification_to_device(token, title, body))
         return {'message': 'Model created successfully',
                 'model': model.to_dict()}, 201
         # Respond with success message and any relevant data
-    def folder_size(self,bucket, folder_path)->int:
-        blobs = bucket.list_blobs(prefix= folder_path)
+
+    def folder_size(self, bucket, folder_path) -> int:
+        blobs = bucket.list_blobs(prefix=folder_path)
         size = 0
         for _ in blobs:
             size += 1
         return size
+
     def get(self):
         try:
             # user_id = request.get_json()['user_id']
@@ -91,7 +97,6 @@ class ModelResource(Resource):
             return {'models': models}, 201
         except Exception as e:
             return {'message': str(e)}, 500
-
 
 
 class ModelDetailResource(Resource):
@@ -110,7 +115,6 @@ class ModelDetailResource(Resource):
         try:
             model = Model.get_model_detail(model_id)
             if model:
-
                 return {'model': model.to_dict()}, 201
             return {'message': 'Model not found'}, 404
 
@@ -139,14 +143,8 @@ class ModelImages(Resource):
 
 
 class ModelVideoResource(Resource):
-    # def __init__(self):
-    #     self.parser = reqparse.RequestParser()
-    #     # self.parser.add_argument('video_id', type=str, required=True)
-    #     self.parser.add_argument('url', type=str, store_missing=False)
 
     def post(self, model_id):
-        # args = self.parser.parse_args()
-        # video_id = args['video_id']
         url = request.form.get('url')
         video_file = request.files.get('video')
 
@@ -154,49 +152,58 @@ class ModelVideoResource(Resource):
             return {"message": "No url provided or video provided"}, 400
 
         try:
-            db = firestore.client()
-            model_ref = db.collection('models').document(model_id)
-            model_doc = model_ref.get()
-            if not model_doc.exists:
-                return {"message": "Model not found"}, 404
+            model = Model.get_model_detail(model_id)  # Get model data
 
-            video_id = str(uuid.uuid4())
-
-            # upload video if video is provided
-            data = model_doc.to_dict()
+            # upload video if video is provided and return url
+            data = model.to_dict()
             if video_file:
-                self.uploadVideo("videos",video_file,data)
+                url = self.uploadVideo("videos", video_file, data)
 
-            video_doc = model_ref.collection('videos').document(video_id)
+            # Save video doc to corresponding model
+            video_id = str(uuid.uuid4())
+            video_doc = model.get_video_ref(video_id)
             video_doc.set({
                 'video_id': video_id,
                 'url': url}
             )
 
             video_data = video_doc.get().to_dict()
-            self.detect_video(model_id,video_data)
+            response = self.detect_video(model_data=model.to_dict(), video_data=video_data)
+
             return {"message": "Video saved successfully",
-                    "video": video_data}, 201
+                    "video": video_data,
+                    "result": response}, 201
         except Exception as e:
             return {"message": str(e)}, 500
-    def detect_video(self, model_id,video_data):
-        script_dir = os.path.dirname(os.path.abspath(__file__))
-        # Construct the img_folder path relative to the script location
-        model_folder = os.path.join(script_dir, "Images", f"{user_id}", f"{model_id}_model")
-        model_file = os.path.join(model_folder,"train","weights","best.pt")
 
+    def detect_video(self, model_data, video_data):
+        # resources/Images/{user_id}/{model_id}
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        model_folder = os.path.join(script_dir,
+                                    "Images",
+                                    f"{model_data['user_id']}",
+                                    f"{model_data['model_id']}")
+        model_file = os.path.join(model_folder, "train", "weights", "best.pt")
+
+        # Create path
         if not os.path.exists(model_file):
-            return {"message": "Model not found"}, 404
+            os.makedirs(model_file, exist_ok=True)
+
         yolo = Model_YOLO(model_file)
         result = yolo.detect(video_data['url'])
 
         video_result = os.path.join(model_folder, "detection_result", f"{video_data['video_id']}.mp4")
         result.save(video_result)
-        self.uploadVideo("detection_result",video_result,video_data)
-        send_notification_to_device(model.token,f"{4}.{model_id} status","Video detected successfully")
-        return {"message": "Video detected successfully"}, 200
-    def uploadVideo(self,folder_type,video_file,data):
+        self.uploadVideo("detection_result", video_result, video_data)
+
+        response = send_notification_to_device(model.token,
+                                               f"{4}.{model_data['model_id']} status",
+                                               "Video detected successfully")
+        return response
+
+    def uploadVideo(self, folder_type, video_file, data):
         bucket = storage.bucket()
-        blob = bucket.blob(f"{data['user_id']}/{data['model_id']}/{folder_type}/"+video_file.filename)
+        blob = bucket.blob(f"{data['user_id']}/{data['model_id']}/{folder_type}/" + video_file.filename)
         blob.upload_from_file(video_file.stream, content_type=video_file.content_type)
         url = blob.public_url
+        return url
