@@ -229,7 +229,7 @@ fun HomeScreen(navController: NavHostController) {
                         tint = Milk
                     )
                     Text(
-                        text = "About us",
+                        text = "Users Model",
                         color = Milk,
                         fontWeight = FontWeight.SemiBold,
                         )
