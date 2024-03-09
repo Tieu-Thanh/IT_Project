@@ -10,7 +10,7 @@
 /detection/Images
 /AuGen/Images
 /.idea
-/backend/detection/Images
+/backend/blueprints/detection/Images
 /backend/blueprints/api/resources/Images
 **/__pycache__/
 /runs

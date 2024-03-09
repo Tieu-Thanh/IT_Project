@@ -47,7 +47,7 @@ class YoloResource(Resource):
             user_id = model.user_id
 
             # Get path
-            BASE_DIR = os.getenv("BASE_DIR", Path(__file__).resolve().parent.parent.parent.parent)
+            BASE_DIR = os.getenv("BASE_DIR", Path(__file__).resolve().parent.parent.parent)
             img_folder = os.path.join(BASE_DIR, "detection", "Images", f"{user_id}", f"{model_id}")
 
             # Check dir exists

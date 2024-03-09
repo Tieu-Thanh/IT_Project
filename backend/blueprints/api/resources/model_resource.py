@@ -55,7 +55,7 @@ class ModelResource(Resource):
         blob.upload_from_string('', content_type='text/plain')
 
         # Crawl images
-        BASE_DIR = os.getenv("BASE_DIR", Path(__file__).resolve().parent.parent.parent.parent)
+        BASE_DIR = os.getenv("BASE_DIR", Path(__file__).resolve().parent.parent.parent)
         img_folder = os.path.join(BASE_DIR, "detection", "Images", f"{user_id}", f"{model_id}")
 
         crawler = Crawler()
@@ -72,13 +72,15 @@ class ModelResource(Resource):
             status=1,
             img_urls=[]  # This contains URLs from Firebase
         )
-        model.save_to_db()
+        # model.save_to_db()
         title = f"{model.status}.{model_id} created"
         body = "Your model data has been created successfully, await to train"
 
         print(send_notification_to_device(token, title, body))
-        return {'message': 'Model created successfully',
-                'model': model.to_dict()}, 201
+        return {
+            'message': 'Model created successfully',
+            'model': model.to_dict()
+        }, 201
         # Respond with success message and any relevant data
 
     def folder_size(self, bucket, folder_path) -> int:
