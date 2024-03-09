@@ -1,4 +1,6 @@
 import os
+from pathlib import Path
+
 from firebase_admin import storage
 from flask import request
 from flask_restful import Resource, reqparse
@@ -45,10 +47,8 @@ class YoloResource(Resource):
             user_id = model.user_id
 
             # Get path
-            # Dynamically get the directory of the current script
-            script_dir = os.path.dirname(os.path.abspath(__file__))
-            # Construct the img_folder path relative to the script location
-            img_folder = os.path.join(script_dir, "Images", f"{user_id}", f"{model_id}")
+            BASE_DIR = os.getenv("BASE_DIR", Path(__file__).resolve().parent.parent.parent.parent)
+            img_folder = os.path.join(BASE_DIR, "detection", "Images", f"{user_id}", f"{model_id}")
 
             # Check dir exists
             if not os.path.exists(img_folder):

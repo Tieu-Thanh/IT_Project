@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module type="PYTHON_MODULE" version="4">
   <component name="NewModuleRootManager">
-<<<<<<< HEAD
-    <content url="file://$MODULE_DIR$" />
+    <content url="file://$MODULE_DIR$">
+      <excludeFolder url="file://$MODULE_DIR$/myvenv" />
+    </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
@@ -13,20 +14,4 @@
   <component name="TemplatesService">
     <option name="TEMPLATE_CONFIGURATION" value="Jinja2" />
   </component>
-=======
-    <content url="file://$MODULE_DIR$">
-      <excludeFolder url="file://$MODULE_DIR$/myvenv" />
-<<<<<<< HEAD:.idea/IT_PROJECT.iml
-      <excludeFolder url="file://$MODULE_DIR$/api1/.idea" />
-      <excludeFolder url="file://$MODULE_DIR$/api1/.venv" />
-      <excludeFolder url="file://$MODULE_DIR$/UML" />
-      <excludeFolder url="file://$MODULE_DIR$/backend/.idea/inspectionProfiles" />
-      <excludeFolder url="file://$MODULE_DIR$/venv" />
-=======
->>>>>>> a9a403c6a99d769abb97d8ee87ebcbd069a7d313:.idea/IT_Project.iml
-    </content>
-    <orderEntry type="inheritedJdk" />
-    <orderEntry type="sourceFolder" forTests="false" />
-  </component>
->>>>>>> bytetrack
 </module>

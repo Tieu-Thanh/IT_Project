@@ -8,6 +8,7 @@ from blueprints.api.models.Model import Model
 from blueprints.api.models.Crawler import Crawler
 import json
 from blueprints.detection.yolo import Model_YOLO
+from pathlib import Path
 
 
 def send_notification_to_device(token, title, body):
@@ -54,13 +55,12 @@ class ModelResource(Resource):
         blob.upload_from_string('', content_type='text/plain')
 
         # Crawl images
-        script_dir = os.path.dirname(os.path.abspath(__file__))  # Dynamically get the directory of the current script
-        script_dir = r"D:\Workspace\IT_Project\backend\blueprints\detection"
-        img_folder = os.path.join(script_dir, "Images", f"{user_id}", f"{model_id}")
+        BASE_DIR = os.getenv("BASE_DIR", Path(__file__).resolve().parent.parent.parent.parent)
+        img_folder = os.path.join(BASE_DIR, "detection", "Images", f"{user_id}", f"{model_id}")
 
         crawler = Crawler()
-        images = crawler.crawl(classes, crawl_number)
-        crawler.download_images(images, download_folder=img_folder)
+        # images = crawler.crawl(classes, crawl_number)
+        # crawler.download_images(images, download_folder=img_folder)
 
         # creating a Model instance
         model = Model(
@@ -72,13 +72,14 @@ class ModelResource(Resource):
             status=1,
             img_urls=[]  # This contains URLs from Firebase
         )
-        model.save_to_db()
+        # model.save_to_db()
         title = f"{model.status}.{model_id} created"
         body = "Your model data has been created successfully, await to train"
 
-        print(send_notification_to_device(token, title, body))
+        # print(send_notification_to_device(token, title, body))
         return {'message': 'Model created successfully',
-                'model': model.to_dict()}, 201
+                'model': model.to_dict(),
+                'path': img_folder}, 201
         # Respond with success message and any relevant data
 
     def folder_size(self, bucket, folder_path) -> int:
@@ -148,7 +149,7 @@ class ModelVideoResource(Resource):
         url = request.form.get('url')
         video_file = request.files.get('video')
         token = request.get('token')
-        
+
         if not url and not video_file:
             return {"message": "No url provided or video provided"}, 400
 
@@ -189,8 +190,7 @@ class ModelVideoResource(Resource):
         # Create path
         if not os.path.exists(model_file):
             # os.makedirs(model_file, exist_ok=True)
-            return  {"error": "Model file does not exists"}, 404
-            
+            return {"error": "Model file does not exists"}, 404
 
         yolo = Model_YOLO(model_file)
         result = yolo.detect(video_data['url'])
