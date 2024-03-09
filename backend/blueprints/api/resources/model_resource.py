@@ -59,8 +59,8 @@ class ModelResource(Resource):
         img_folder = os.path.join(BASE_DIR, "detection", "Images", f"{user_id}", f"{model_id}")
 
         crawler = Crawler()
-        # images = crawler.crawl(classes, crawl_number)
-        # crawler.download_images(images, download_folder=img_folder)
+        images = crawler.crawl(classes, crawl_number)
+        crawler.download_images(images, download_folder=img_folder)
 
         # creating a Model instance
         model = Model(
@@ -72,14 +72,13 @@ class ModelResource(Resource):
             status=1,
             img_urls=[]  # This contains URLs from Firebase
         )
-        # model.save_to_db()
+        model.save_to_db()
         title = f"{model.status}.{model_id} created"
         body = "Your model data has been created successfully, await to train"
 
-        # print(send_notification_to_device(token, title, body))
+        print(send_notification_to_device(token, title, body))
         return {'message': 'Model created successfully',
-                'model': model.to_dict(),
-                'path': img_folder}, 201
+                'model': model.to_dict()}, 201
         # Respond with success message and any relevant data
 
     def folder_size(self, bucket, folder_path) -> int:
@@ -91,8 +90,6 @@ class ModelResource(Resource):
 
     def get(self):
         try:
-            # user_id = request.get_json()['user_id']
-
             user_id = request.args.get('user_id')
             models = Model.get_models_by_user_id(user_id)
             return {'models': models}, 201

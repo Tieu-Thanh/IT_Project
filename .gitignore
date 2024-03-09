@@ -10,11 +10,8 @@
 /detection/Images
 /AuGen/Images
 /.idea
-/backend/blueprints/detection/Images
+/backend/detection/Images
 /backend/blueprints/api/resources/Images
-
-**/__pycache__/
-
 **/__pycache__/
 /runs
 /detectron2

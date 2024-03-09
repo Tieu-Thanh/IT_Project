@@ -65,12 +65,6 @@ class YoloResource(Resource):
                     local_path = os.path.join(img_folder, filename)
                     download_image_from_storage(url, local_path)
 
-            # <<<<<<< HEAD
-            #         # # Train Model YOLO
-            #         # yolo = Model_YOLO()
-            #         # yolo.train(model.classes, input_folder=img_folder, extension=".jpg")
-            #         train_yolo_model.delay(model.classes, img_folder, ".jpg")
-            # =======
             # Train Model YOLO
             model.update_status(2)
             yolo = Model_YOLO()
@@ -91,7 +85,4 @@ class YoloResource(Resource):
             print("Clear image folder")
         except Exception as e:
             print(f"Error: {e}")
-# >>>>>>> 8fadeab0632b2cb82d5aa4c2c6eb87b89836fe96
-#
-#         # return
-#         return {'message': img_folder, 'data': model.to_dict(), 'model_images': model.img_urls}, 201
+
