@@ -72,7 +72,7 @@ class ModelResource(Resource):
             status=1,
             img_urls=[]  # This contains URLs from Firebase
         )
-        # model.save_to_db()
+        model.save_to_db()
         title = f"{model.status}.{model_id} created"
         body = "Your model data has been created successfully, await to train"
 
@@ -147,7 +147,7 @@ class ModelVideoResource(Resource):
     def post(self, model_id):
         url = request.form.get('url')
         video_file = request.files.get('video')
-        token = request.get('token')
+        token = request.form.get('token')
 
         if not url and not video_file:
             return {"message": "No url provided or video provided"}, 400
