@@ -1,6 +1,6 @@
 from celery import current_app as celery_app
 from blueprints.detection.yolo import Model_YOLO
-
+import logging
 
 @celery_app.task(name="train_yolo_model")
 def train_yolo_model(classes, img_folder, extension):

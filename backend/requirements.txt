@@ -13,3 +13,4 @@ roboflow
 ultralytics
 autodistill_grounded_sam
 celery
+redis

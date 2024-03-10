@@ -97,3 +97,21 @@ class Model:
         db = firestore.client()
         video_ref = db.collection('models').document(self.model_id).collection('videos').document(video_id)
         return video_ref
+
+    def get_videos(self):
+        """
+        Retrieve all video documents from the 'videos' sub-collection for this model instance.
+        """
+        db = firestore.client()
+        videos_ref = db.collection('models').document(self.model_id).collection('videos')
+        videos_query = videos_ref.get()
+
+        videos = []
+        for video in videos_query:
+            video_data = video.to_dict()
+            videos.append({
+                'video_id': video_data.get('video_id'),
+                'url': video_data.get('url')
+            })
+
+        return videos

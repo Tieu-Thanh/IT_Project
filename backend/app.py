@@ -27,9 +27,6 @@ def create_app():
     def hello_world():
         return 'Hello, World!'
 
-    print(app.config['CELERY_BROKER_URL'])
-    print(app.config['CELERY_RESULT_BACKEND'])
-    print('Celery Broker URL:', celery.conf.broker_url)
 
     return app, celery
 

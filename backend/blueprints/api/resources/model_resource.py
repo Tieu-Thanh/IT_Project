@@ -209,3 +209,20 @@ class ModelVideoResource(Resource):
         blob.upload_from_file(video_file.stream, content_type=video_file.content_type)
         url = blob.public_url
         return url
+
+    def get(self, model_id):
+        """
+        Retrieve videos for a given model_id by utilizing the Model class method.
+        """
+        try:
+            model = Model.get_model_detail(model_id)
+            if model is None:
+                return {"message": "Model not found"}, 404
+
+            videos = model.get_videos()
+            if videos:
+                return {"model": model.to_dict(), "videos": videos}, 201
+            else:
+                return {"message": "No videos found for the specified model."}, 404
+        except Exception as e:
+            return {"message": str(e)}, 500
