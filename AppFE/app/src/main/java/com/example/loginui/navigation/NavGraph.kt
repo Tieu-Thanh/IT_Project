@@ -2,8 +2,10 @@ package com.example.loginui.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
 import com.example.loginui.core.Repository
 import com.example.loginui.FunctionDetail.Co_function
 import com.example.loginui.FunctionDetail.DM_function
@@ -15,6 +17,7 @@ import com.example.loginui.Screen.ModelInfo
 import com.example.loginui.Screen.SignIn
 import com.example.loginui.Screen.SignUp
 import com.example.loginui.Screen.UrlInputTextBox
+import com.example.loginui.Screen.UrlVideoPopUp
 import com.example.loginui.SubScreen.UserModels
 import com.example.loginui.SubScreen.Contact_us
 import com.example.loginui.SubScreen.News
@@ -58,11 +61,17 @@ fun SetupNavGraph(navController: NavHostController) {
             ListObject(navController = navController)
         }
         composable("ModelInfo"){
-            ModelInfo()
+            ModelInfo(navController = navController)
         }
         composable("ApplyModel/{modelId}"){
             backstackEntry->
             UrlInputTextBox(navController = navController,modelId = backstackEntry.arguments?.getString("modelId")!!)
+        }
+        composable(
+            "UrlVideoPopUp/{url}"
+        ) { backStackEntry ->
+
+            UrlVideoPopUp(navController = navController, url = backStackEntry.arguments?.getString("url")!!)
         }
     }
 }

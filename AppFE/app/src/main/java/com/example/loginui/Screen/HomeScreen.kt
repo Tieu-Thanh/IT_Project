@@ -211,7 +211,7 @@ fun HomeScreen(navController: NavHostController) {
                         }
                         .padding(top = 12.dp, bottom = 12.dp, end = 8.dp, start = 8.dp)
                         .height(90.dp)
-                        .width(90.dp)
+                        .width(95.dp)
                         .background(
                             brush = getGradient(PurpleSpecStart, PurpleSpecEnd),
                             shape = RoundedCornerShape(20.dp)

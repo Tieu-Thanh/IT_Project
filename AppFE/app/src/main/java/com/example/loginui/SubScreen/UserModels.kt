@@ -64,7 +64,9 @@ fun UserModels(navController: NavHostController) {
         modelList.clear()
         modelList.addAll(repo.getModelList().models)
     }
-    Column {
+    Column (
+        modifier = Modifier.background(Color.White)
+    ){
         UserModelsTopBackground(navController)
         LazyColumn {
             items(modelList) { modelResource ->
@@ -128,7 +130,6 @@ fun UserModels(navController: NavHostController) {
                             }
                             Row(
                                 modifier = Modifier.padding(start = 8.dp)
-
                             ) {
                                 Icon(
                                     imageVector = Icons.Rounded.PartyMode,

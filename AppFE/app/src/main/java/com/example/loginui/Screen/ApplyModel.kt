@@ -8,6 +8,7 @@ import android.widget.VideoView
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -20,7 +21,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.ArrowForward
 import androidx.compose.material.icons.rounded.ArrowUpward
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Mail
@@ -39,6 +42,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -55,16 +59,22 @@ import com.example.loginui.navigation.user
 import com.example.loginui.ui.theme.DarkSpecEnd
 import com.example.loginui.ui.theme.DarkSpecStart
 import com.example.loginui.ui.theme.GoldSand
+import com.example.loginui.ui.theme.Milk
 import com.example.loginui.ui.theme.TextColor1
 import com.example.loginui.ui.theme.interFontFamily
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.YouTubePlayer
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.listeners.AbstractYouTubePlayerListener
 import com.pierfrancescosoffritti.androidyoutubeplayer.core.player.views.YouTubePlayerView
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 @Composable
 fun UrlInputTextBox(navController: NavHostController, modelId: String) {
     val model = repo.getModel(modelId)
-    Column {
+    Column(
+        modifier = Modifier.background(Color.White)
+    ) {
+
         val isClick = remember { mutableStateOf(false) }
         var videoUri by remember { mutableStateOf<Uri?>(null) }
         var videoReady by remember { mutableStateOf(false) }
@@ -142,8 +152,7 @@ fun UrlInputTextBox(navController: NavHostController, modelId: String) {
         }
 
 
-
-
+        var url by remember { mutableStateOf("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4") }
         Box(
             modifier = Modifier
                 .padding(start = 12.dp, top = 8.dp, end = 12.dp)
@@ -153,7 +162,6 @@ fun UrlInputTextBox(navController: NavHostController, modelId: String) {
         ) {
 
             Column(modifier = Modifier.padding(16.dp)) {
-                var url by remember { mutableStateOf("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4") }
                 val isValidUrl = remember(url) { url.isValidUrl() }
 
                 OutlinedTextField(
@@ -169,7 +177,7 @@ fun UrlInputTextBox(navController: NavHostController, modelId: String) {
                                 isClick.value = true
                             }) {
                                 Icon(
-                                    imageVector = Icons.Filled.Clear,
+                                    imageVector = Icons.Rounded.Add,
                                     contentDescription = "Clear text"
                                 )
                             }
@@ -188,11 +196,11 @@ fun UrlInputTextBox(navController: NavHostController, modelId: String) {
                     onClick = {
                         if (videoUri != null) {
                             Log.d(TAG, "uri case: $videoUri")
-                            repo.postVideo(videoUri!!, modelId, null,context)
+                            repo.postVideo(videoUri!!, modelId, null, context)
                         } else {
                             Log.d(TAG, "url case: $url")
                             Log.d(TAG, "UrlInputTextBox: $modelId")
-                            repo.postVideo(null, modelId, url,context)
+                            repo.postVideo(null, modelId, url, context)
                             url = ""
                         }
                         videoReady = false
@@ -226,7 +234,11 @@ fun UrlInputTextBox(navController: NavHostController, modelId: String) {
                     colors = ButtonDefaults.buttonColors(TextColor1),
                     shape = RoundedCornerShape(50)
                 ) {
-                    Icon(imageVector = Icons.Rounded.ArrowUpward, contentDescription = "UP")
+                    Icon(
+                        imageVector = Icons.Rounded.ArrowUpward,
+                        contentDescription = "UP",
+                        tint = Milk
+                    )
                 }
                 if (isClick.value) {
                     VideoPlayer(Uri.parse(url)) {
@@ -240,14 +252,28 @@ fun UrlInputTextBox(navController: NavHostController, modelId: String) {
                 }
             }
         }
+        print(url)
+        Button(
+            onClick = {
+                val encodedUrl = URLEncoder.encode(url, StandardCharsets.UTF_8.toString())
+                navController.navigate("UrlVideoPopUp/$encodedUrl")
+            }, modifier = Modifier
+                .fillMaxWidth()
+                .height(70.dp)
+                .padding(start = 64.dp, end = 64.dp, top = 8.dp, bottom = 8.dp),
+            colors = ButtonDefaults.buttonColors(TextColor1),
+            shape = RoundedCornerShape(50)
+        ) {
+            Icon(imageVector = Icons.Rounded.ArrowForward, contentDescription = "UP", tint = Milk)
+        }
         Image(
-
             painter = painterResource(id = R.drawable.bottom_background),
             contentDescription = null,
             modifier = Modifier.padding(top = 50.dp),
             contentScale = ContentScale.FillBounds
 
         )
+
     }
 
 

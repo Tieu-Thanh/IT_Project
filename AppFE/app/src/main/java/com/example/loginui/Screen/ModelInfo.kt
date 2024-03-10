@@ -91,12 +91,11 @@ import com.example.loginui.navigation.user
 val TAG = "ModelInfo"
 val usersImages = mutableListOf<Bitmap?>()
 
-@Preview
 @SuppressLint("MutableCollectionMutableState", "InvalidColorHexValue",
     "UnusedBoxWithConstraintsScope"
 )
 @Composable
-fun ModelInfo() {
+fun ModelInfo(navController: NavHostController) {
     var loading by remember {
         mutableStateOf(false)
     }
@@ -178,7 +177,7 @@ fun ModelInfo() {
     Column(
         modifier = Modifier.background(color = WhiteColor)
     ) {
-        ModelTopBackground()
+        ModelTopBackground(navController)
         Box(
             modifier = Modifier
                 .height(40.dp)
@@ -450,13 +449,13 @@ fun ComposableProcessBar(
 }
 
 @Composable
-fun ModelTopBackground() {
+fun ModelTopBackground(navController: NavHostController) {
 
     Row(
         modifier = Modifier.padding(top = 16.dp)
     ) {
         IconButton(onClick = {
-//                navController.navigate("ListObject")
+                navController.navigate("ListObject")
         }) {
             Icon(
                 imageVector = Icons.Rounded.ArrowBack,
