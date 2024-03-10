@@ -40,6 +40,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -67,6 +68,7 @@ fun UrlInputTextBox(navController: NavHostController, modelId: String) {
         val isClick = remember { mutableStateOf(false) }
         var videoUri by remember { mutableStateOf<Uri?>(null) }
         var videoReady by remember { mutableStateOf(false) }
+        val context = LocalContext.current
         ApplyModelTopBackground(navController)
         Spacer(modifier = Modifier.height(6.dp))
         Box(
@@ -151,7 +153,7 @@ fun UrlInputTextBox(navController: NavHostController, modelId: String) {
         ) {
 
             Column(modifier = Modifier.padding(16.dp)) {
-                var url by remember { mutableStateOf("https://www.youtube.com/watch?v=17c7kDMG_mU") }
+                var url by remember { mutableStateOf("http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4") }
                 val isValidUrl = remember(url) { url.isValidUrl() }
 
                 OutlinedTextField(
@@ -186,11 +188,11 @@ fun UrlInputTextBox(navController: NavHostController, modelId: String) {
                     onClick = {
                         if (videoUri != null) {
                             Log.d(TAG, "uri case: $videoUri")
-                            repo.postVideo(videoUri!!, modelId, null)
+                            repo.postVideo(videoUri!!, modelId, null,context)
                         } else {
                             Log.d(TAG, "url case: $url")
                             Log.d(TAG, "UrlInputTextBox: $modelId")
-                            repo.postVideo(null, modelId, url)
+                            repo.postVideo(null, modelId, url,context)
                             url = ""
                         }
                         videoReady = false

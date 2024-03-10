@@ -389,7 +389,7 @@ fun ModelInfo() {
 }
 
 fun uploadFunction(sizeOfDefaultDataset: Int, context: Context) {
-    repo.createToken(
+    repo.postModelInfo(
         "CO",
         "Yolov8",
         itemList,

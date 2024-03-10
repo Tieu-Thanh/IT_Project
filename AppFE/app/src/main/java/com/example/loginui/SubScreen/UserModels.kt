@@ -1,6 +1,7 @@
 package com.example.loginui.SubScreen
 
 import android.annotation.SuppressLint
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -67,32 +68,33 @@ fun UserModels(navController: NavHostController) {
         UserModelsTopBackground(navController)
         LazyColumn {
             items(modelList) { modelResource ->
-
-
+                val color = modelResource.status?.let { getColorByStatus(status = it) }
                 Column(modifier = Modifier
                     .padding(16.dp)
-
+                    .fillMaxWidth()
+                    .background(color!!)
                     .clickable {
-//                    when (modelResource.status) {
-//                        0 -> {
-//                            Toast
-//                                .makeText(context, "Data is not ready yet", Toast.LENGTH_SHORT)
-//                                .show()
-//                        }
-//                        1 -> {
-//                            repo.trainModel(modelResource.modelId)
-//                            Toast
-//                                .makeText(context, "Start Training", Toast.LENGTH_SHORT)
-//                                .show()
-//                        }
-//
-//                        2 -> Toast
-//                            .makeText(context, "Model is training", Toast.LENGTH_SHORT)
-//                            .show()
+                        when (modelResource.status) {
+                            0 -> {
+                                Toast
+                                    .makeText(context, "Data is not ready yet", Toast.LENGTH_SHORT)
+                                    .show()
+                            }
 
-//                        3 ->
-                        navController.navigate("ApplyModel/${modelResource.modelId}")
-//                    }
+                            1 -> {
+                                repo.trainModel(modelResource.modelId)
+                                Toast
+                                    .makeText(context, "Start Training", Toast.LENGTH_SHORT)
+                                    .show()
+                            }
+
+                            2 -> Toast
+                                .makeText(context, "Model is training", Toast.LENGTH_SHORT)
+                                .show()
+
+                            3 ->
+                                navController.navigate("ApplyModel/${modelResource.modelId}")
+                        }
                     }
                 ) {
 

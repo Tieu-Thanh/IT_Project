@@ -1,5 +1,6 @@
 package com.example.loginui.core
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
@@ -15,11 +16,14 @@ import com.example.loginui.data.authen.SignInResponse
 import com.example.loginui.data.authen.SignUpRequest
 import com.example.loginui.data.authen.SignUpResponse
 import com.example.loginui.navigation.repo
+import com.google.ai.client.generativeai.type.content
 import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.suspendCancellableCoroutine
+import okhttp3.MediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
+import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.ResponseBody
@@ -89,27 +93,8 @@ class Repository  {
     }
 
 
-    private fun postModelInfo(modelDetail:ModelResource, bitmaps: List<Bitmap>, context: Context){
-
-        apiService.postModelInfo(modelDetail).enqueue(object : Callback<Void>{
-            override fun onResponse(call: Call<Void>, response: Response<Void>) {
-            }
-            override fun onFailure(call: Call<Void>, t: Throwable) {
-                if (bitmaps.isNotEmpty()) {
-                    postUserImage(bitmaps, context, modelDetail.modelId)
-                    println("Image Uploaded")
-                }
-            }
-        })
-
-    }
-    fun createToken(modelId: String,modelName: String, classes:List<String>, dataSize:Int, bitmaps: List<Bitmap>, context: Context){
-        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
-            if (!task.isSuccessful) {
-                Log.w("TAG", "Fetching FCM registration token failed", task.exception)
-                return@addOnCompleteListener
-            }
-            val token = task.result
+    fun postModelInfo(modelId: String,modelName: String, classes:List<String>, dataSize:Int, bitmaps: List<Bitmap>,context: Context){
+        createToken { token ->
             val modelDetail = ModelResource(
                 modelId,
                 currentUser,
@@ -118,7 +103,25 @@ class Repository  {
                 dataSize,
                 token = token
             )
-            postModelInfo(modelDetail,bitmaps,context)
+            apiService.postModelInfo(modelDetail).enqueue(object : Callback<Void>{
+                override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                }
+                override fun onFailure(call: Call<Void>, t: Throwable) {
+                    if (bitmaps.isNotEmpty()) {
+                        postUserImage(bitmaps, context, modelDetail.modelId)
+                        println("Image Uploaded")
+                    }
+                }
+            })
+        }
+    }
+    private fun createToken(token: (String) -> Unit){
+        FirebaseMessaging.getInstance().token.addOnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                Log.w("TAG", "Fetching FCM registration token failed", task.exception)
+                return@addOnCompleteListener
+            }
+            token(task.result)
         }
     }
     suspend fun updateModelList():ListModelResponse? = suspendCancellableCoroutine{
@@ -193,30 +196,41 @@ class Repository  {
         })
     }
 
-    fun postVideo(uri: Uri?,modelId: String,url:String?){
+    @SuppressLint("Recycle")
+    fun postVideo(uri: Uri?, modelId: String, url:String?, context: Context){
         val path = if (uri != null) {
-            val file = File(uri.path!!)
-            val requestBody = file.asRequestBody("video/*".toMediaTypeOrNull())
-            MultipartBody.Part.createFormData("file", file.name, requestBody)
+            val contentResolver = context.contentResolver
+            val inputStream = contentResolver.openInputStream(uri)
+            val requestBody = inputStream?.let {
+                val byteArray = it.readBytes()
+                byteArray.toRequestBody(
+                    contentResolver.getType(uri)?.toMediaTypeOrNull(),
+                    0,
+                    byteArray.size
+                )
+            }
+            MultipartBody.Part.createFormData("video", "filename.mp4", requestBody!!)
         } else {
             null
         }
         val textBody = url?.toRequestBody("text/plain".toMediaTypeOrNull())
-        apiService.uploadVideo(path,url = textBody, model_id = modelId).enqueue(object :Callback<Void>{
-            override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                if(response.isSuccessful){
-                    println("Video uploaded successfully")
+        createToken { token->
+            val requestToken = token.toRequestBody("text/plain".toMediaTypeOrNull())
+            apiService.uploadVideo(path,url = textBody, model_id = modelId, token = requestToken).enqueue(object :Callback<Void>{
+                override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                    if(response.isSuccessful){
+                        println("Video uploaded successfully")
+                    }
+                    else{
+                        println("Upload error: ${response.message()}")
+                    }
                 }
-                else{
-                    println("Upload error: ${response.message()}")
+                override fun onFailure(call: Call<Void>, t: Throwable) {
+                    println("Error: ${t.message}")
                 }
-            }
 
-            override fun onFailure(call: Call<Void>, t: Throwable) {
-                println("Error: ${t.message}")
-            }
-
-        })
+            })
+        }
     }
 
 

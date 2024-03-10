@@ -37,7 +37,7 @@ interface AuthService {
 
         @Multipart
         @POST("api/models/{model_id}/videos")
-        fun uploadVideo(@Part video: MultipartBody.Part?=null,@Part("url") url:RequestBody?=null,@Path("model_id") model_id: String): Call<Void>
+        fun uploadVideo(@Part video: MultipartBody.Part?=null,@Part("url") url:RequestBody?=null,@Part("token") token:RequestBody,@Path("model_id") model_id: String): Call<Void>
         @GET("api/models")
         fun getModelList(@Query("user_id") field:String): Call<ListModelResponse>
 
