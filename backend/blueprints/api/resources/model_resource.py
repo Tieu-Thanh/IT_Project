@@ -196,7 +196,7 @@ class ModelVideoResource(Resource):
 
         video_result = os.path.join(model_folder, "detection_result", f"{video_data['video_id']}.mp4")
         result.save(video_result)
-        self.uploadVideo("detection_result", video_result, video_data)
+        self.uploadVideo("detection_result", result, video_data)
 
         response = send_notification_to_device(token,
                                                f"{4}.{model_data['model_id']} status",

@@ -48,7 +48,7 @@ class Model_YOLO():
                 input_data: image, video, Youtube, .etc. 
                     See other types at: https://docs.ultralytics.com/modes/predict/#inference-sources
         '''
-        results = self.model(input_source, save=True, imgsz=640, conf=0.5)
+        return self.model(input_source, save=True, imgsz=640, conf=0.5)
 
 
     def detect_image(self, image_source, classes: list= []):
