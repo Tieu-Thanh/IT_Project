@@ -35,13 +35,14 @@ class YoloResource(Resource):
         self.parser = reqparse.RequestParser()
         # json parameters
         self.parser.add_argument('model_id', type=str, required=True)
+        self.parser.add_argument('token', type=str, required=True)
 
     def post(self):
         try:
             args = self.parser.parse_args()
             # get parameters
             model_id = args['model_id']
-
+            token = args['token']
             # data-handling logic
             model = Model.get_model_detail(model_id)
             user_id = model.user_id
@@ -72,7 +73,7 @@ class YoloResource(Resource):
             yolo.train(model.classes, input_folder=img_folder, extension='.jpg', save_dir=model_folder)
             self.removeFile(img_folder)
             model.update_status(3)
-            send_notification_to_device(model.token, f"{model.status}.{model_id} status", "Model complete!")
+            send_notification_to_device(token, f"{model.status}.{model_id} status", "Model complete!")
             return {"message": "Model train successful",
                     "model_folder": model_folder}, 201
         except Exception as e:

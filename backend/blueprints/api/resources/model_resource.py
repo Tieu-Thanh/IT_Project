@@ -1,14 +1,15 @@
-from firebase_admin import firestore, storage, messaging
-from flask import request
+import io
 import os
 import uuid
-from flask_restful import Resource, reqparse
-from concurrent.futures import ThreadPoolExecutor, as_completed
-from blueprints.api.models.Model import Model
-from blueprints.api.models.Crawler import Crawler
-import json
-from blueprints.detection.yolo import Model_YOLO
 from pathlib import Path
+from types import SimpleNamespace
+
+from blueprints.api.models.Crawler import Crawler
+from blueprints.api.models.Model import Model
+from blueprints.detection.yolo import Model_YOLO
+from firebase_admin import storage, messaging
+from flask import request
+from flask_restful import Resource, reqparse
 
 
 def send_notification_to_device(token, title, body):
@@ -157,6 +158,7 @@ class ModelVideoResource(Resource):
 
             # upload video if video is provided and return url
             data = model.to_dict()
+            print(video_file)
             if video_file:
                 url = self.uploadVideo("videos", video_file, data)
 
@@ -179,12 +181,14 @@ class ModelVideoResource(Resource):
 
     def detect_video(self, token, model_data, video_data):
         # resources/Images/{user_id}/{model_id}
-        script_dir = os.path.dirname(os.path.abspath(__file__))
+
+        BASE_DIR = os.getenv("BASE_DIR", Path(__file__).resolve().parent.parent.parent)
+        script_dir = os.path.join(BASE_DIR, "detection")
         model_folder = os.path.join(script_dir,
                                     "Images",
                                     f"{model_data['user_id']}",
                                     f"{model_data['model_id']}")
-        model_file = os.path.join(model_folder, "train", "weights", "best.pt")
+        model_file = os.path.join(model_folder+"_model", "train", "weights", "best.pt")
 
         # Create path
         if not os.path.exists(model_file):
@@ -192,24 +196,42 @@ class ModelVideoResource(Resource):
             return {"error": "Model file does not exists"}, 404
 
         yolo = Model_YOLO(model_file)
-        result = yolo.detect(video_data['url'])
+        video_path = os.path.join(model_folder+"_model", "detection_result")
+        yolo.detect(video_data['url'],video_path,video_data['video_id'])
 
-        video_result = os.path.join(model_folder, "detection_result", f"{video_data['video_id']}.mp4")
-        result.save(video_result)
-        self.uploadVideo("detection_result", result, video_data)
+        video_source = os.path.join(video_path,video_data['video_id'])
+        video_file = self.create_video_file_mock(self.takeVideo(video_source))
 
-        response = send_notification_to_device(token,
-                                               f"{4}.{model_data['model_id']} status",
-                                               "Video detected successfully")
+        self.uploadVideo("detection_result", video_file, video_data)
+        print("Video result uploaded successfully")
+        tittle = f"{4}.{model_data['model_id']} status"
+        body = "Video detected successfully"
+        response = send_notification_to_device(token,tittle,body)
         return response
 
     def uploadVideo(self, folder_type, video_file, data):
-        bucket = storage.bucket()
-        blob = bucket.blob(f"{data['user_id']}/{data['model_id']}/{folder_type}/" + video_file.filename)
-        blob.upload_from_file(video_file.stream, content_type=video_file.content_type)
-        url = blob.public_url
-        return url
+        try:
+            bucket = storage.bucket()
+            blob = bucket.blob(f"{data['user_id']}/{data['model_id']}/{folder_type}/" + video_file.filename)
+            blob.upload_from_file(video_file.stream, content_type=video_file.content_type)
+            url = blob.public_url
+            print(url)
+            return url
+        except Exception as e:
+            return {"error": e}, 500
 
+    def create_video_file_mock(self,video_path):
+        with open(video_path, 'rb') as file:
+            file_content = file.read()
+
+        video_stream = io.BytesIO(file_content)
+        video_file_mock = SimpleNamespace(
+            stream=video_stream,
+            filename=os.path.basename(video_path),
+            content_type='video/avi'
+        )
+
+        return video_file_mock
     def get(self, model_id):
         """
         Retrieve videos for a given model_id by utilizing the Model class method.
@@ -226,3 +248,13 @@ class ModelVideoResource(Resource):
                 return {"message": "No videos found for the specified model."}, 404
         except Exception as e:
             return {"message": str(e)}, 500
+    def takeVideo(self,video_source):
+        try:
+            os.path.isdir(video_source)
+            files = os.listdir(video_source)
+            if files:  # Check null file
+                return os.path.join(video_source, files[0])
+            else:
+                print("Empty folder")
+        except Exception as e:
+            return {"error": e}, 500
