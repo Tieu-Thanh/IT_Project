@@ -9,11 +9,11 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.example.loginui.MainActivity
 import com.example.loginui.R
+import com.example.loginui.navigation.repo
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
 class FDKService : FirebaseMessagingService() {
-//    lateinit var listener: FDKServiceListener
     private lateinit var notificationManager: NotificationManager
     private val context = baseContext
     override fun onCreate() {
@@ -30,13 +30,15 @@ class FDKService : FirebaseMessagingService() {
         Log.d("aaaaaaaaaaaa", "onMessageReceived: ${message.data.values}")
 
         message.notification?.let {
-            val title = message.data["title"].toString()
-            val mes = message.data["message"]?.split(".")
+            val title = it.title?.split(".")
+            val mes = it.body!!
             Log.d("1111", "onMessageReceived: $title")
             Log.d("1111", "onMessageReceived: $mes")
-            when(mes?.get(0)?.toInt()){
-                1->sendNotification(mes[1],title,0)
-                2->sendNotification(mes[1],title,1)
+            when(title?.get(0)?.toInt()){
+                1-> {
+                    sendNotification(mes, title[1], 0)
+                }
+                2->sendNotification(mes,title[1],1)
 //                4->{
 //
 //                }
@@ -61,4 +63,5 @@ class FDKService : FirebaseMessagingService() {
             .setContentText(message).setAutoCancel(true)
         notificationManager.notify(channelId,notification.build())
     }
+
 }
