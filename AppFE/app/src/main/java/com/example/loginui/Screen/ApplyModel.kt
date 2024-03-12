@@ -210,7 +210,7 @@ fun UrlInputTextBox(navController: NavHostController, modelId: String) {
                     colors = ButtonDefaults.buttonColors(TextColor1),
                     shape = RoundedCornerShape(50)
                 ) {
-                    Text("Start Calculate")
+                    Text(text = "Start Calculate", color = Milk)
                 }
 
                 val pickVideoLauncher = rememberLauncherForActivityResult(

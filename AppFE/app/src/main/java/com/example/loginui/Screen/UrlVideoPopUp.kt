@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -59,7 +60,9 @@ fun UrlVideoPopUp(navController: NavHostController, url: String) {
                 .fillMaxWidth()
                 .shadow(2.dp, shape = RoundedCornerShape(10.dp))
         ) {
-            Column(modifier = Modifier.padding(16.dp)) {
+            Column(modifier = Modifier
+                .padding(16.dp)
+                .fillMaxSize()) {
                 if (videoUri != null) {
                     VideoPlayer(videoUri!!) {
                         videoReady = it
@@ -85,7 +88,8 @@ fun UrlVideoPopUp(navController: NavHostController, url: String) {
 @Composable
 fun ResultVideoPlayer(uri: Uri, videoReady: (Boolean) -> Unit) {
     AndroidView(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth(),
         factory = { context ->
             VideoView(context).apply {
                 setMediaController(MediaController(context))

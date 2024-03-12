@@ -16,7 +16,6 @@ import com.example.loginui.data.authen.SignInResponse
 import com.example.loginui.data.authen.SignUpRequest
 import com.example.loginui.data.authen.SignUpResponse
 import com.example.loginui.navigation.repo
-import com.google.ai.client.generativeai.type.content
 import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.suspendCancellableCoroutine
 import okhttp3.MediaType

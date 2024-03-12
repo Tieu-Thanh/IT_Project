@@ -1,7 +1,5 @@
 package com.example.loginui.Screen
 
-import android.R.attr.singleLine
-
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
@@ -18,10 +16,10 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.absoluteOffset
@@ -39,10 +37,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Camera
 import androidx.compose.material.icons.rounded.ArrowBack
-import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Circle
-import androidx.compose.material.icons.rounded.Mail
-import androidx.compose.material.icons.rounded.PartyMode
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -52,7 +48,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -69,6 +64,7 @@ import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -79,7 +75,6 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
 import com.example.loginui.navigation.repo
-import com.example.loginui.navigation.user
 import com.example.loginui.ui.theme.DarkSpecEnd
 import com.example.loginui.ui.theme.DarkSpecStart
 import com.example.loginui.ui.theme.GoldSand
@@ -93,9 +88,11 @@ val TAG = "ModelInfo"
 val usersImages = mutableListOf<Bitmap?>()
 
 
-@SuppressLint("MutableCollectionMutableState", "InvalidColorHexValue",
+@SuppressLint(
+    "MutableCollectionMutableState", "InvalidColorHexValue",
     "UnusedBoxWithConstraintsScope"
 )
+
 @Composable
 fun ModelInfo(navController: NavHostController) {
     var loading by remember {
@@ -163,9 +160,11 @@ fun ModelInfo(navController: NavHostController) {
         }
     }
     if (loading) {
-        BoxWithConstraints(modifier = Modifier
-            .size(200.dp)
-            .zIndex(1f), contentAlignment = Alignment.Center) {
+        BoxWithConstraints(
+            modifier = Modifier
+                .size(200.dp)
+                .zIndex(1f), contentAlignment = Alignment.Center
+        ) {
             ComposableProcessBar(
                 percentage = 1.0f, number = 100,
                 onAnimationEnd = {
@@ -220,73 +219,56 @@ fun ModelInfo(navController: NavHostController) {
                 .fillMaxWidth()
                 .shadow(2.dp, shape = RoundedCornerShape(10.dp))
         ) {
-            Column {
-                Spacer(modifier = Modifier.height(6.dp))
-                Row(
-                    modifier = Modifier.padding(start = 8.dp)
+            Row(modifier = Modifier.padding(8.dp)) {
+                OutlinedTextField(
+                    value = modelId,
+                    onValueChange = { newName ->
+                        // Update the state with the new name
+                        modelId = newName
+                    },
+                    label = {
+                        Text(
+                            text = "Model name",
+                            style = TextStyle(
+                                color = Color.Black,
+                                fontWeight = FontWeight.Bold,
+                                fontSize = 20.sp,
+                                fontFamily = interFontFamily
+                            )
+                        )
+                    }, // Label displayed on the text field
 
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.Mail,
-                        contentDescription = "Model Info",
-                        modifier = Modifier
-                            .size(25.dp)
-                            .padding(end = 3.dp, top = 2.dp),
-                        tint = GoldSand
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(60.dp)
+                        .padding(start = 4.dp, end = 4.dp)
+                        .focusable(true),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedTextColor = Color.Black,
+                        focusedBorderColor = Color.Gray, // Optional: also make the border transparent when the field is focused
+                        // You can also adjust other colors like background, cursor color as needed
+                        unfocusedBorderColor = Color.Black, // Makes border transparent
+                    ),
+                    singleLine = true,
+                    textStyle = (
+                            LocalTextStyle.current.copy(textAlign = TextAlign.Start)
+                            ),
+
                     )
-                    Text(
-                        text = "Email: $user",
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 20.sp
-                    )
-                }
-                Row(
-                    modifier = Modifier.padding(start = 8.dp, top = 8.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.PartyMode,
-                        contentDescription = "Model Info",
-                        modifier = Modifier
-                            .size(25.dp)
-                            .padding(end = 3.dp, top = 2.dp),
-                        tint = GoldSand
-                    )
-                    Text(
-                        text = "Model Id: ",
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 20.sp
-                    )
-                    TextField(
-                        value = modelId,
-                        onValueChange = { newName ->
-                            // Update the state with the new name
-                            modelId = newName
-                        },
-                        label = { Text("Model Name") }, // Label displayed on the text field
-                        modifier = Modifier
-                            .fillMaxWidth(0.4f) // Fill the max width of its parent
-                            .height(IntrinsicSize.Min),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = Color.Transparent, // Optional: also make the border transparent when the field is focused
-                            // You can also adjust other colors like background, cursor color as needed
-                            unfocusedBorderColor = Color.Transparent, // Makes border transparent
-                        ),
-                        singleLine = true,
-                        textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center)
-                    )
-                }
+
             }
+
         }
 
 
         LazyRow {
 
             items(itemList) { item ->
-                Button(onClick = {},
+                Button(
+                    onClick = {},
                     modifier = Modifier.padding(start = 8.dp, top = 10.dp),
-                    colors = ButtonDefaults.buttonColors(TextColor1)) {
+                    colors = ButtonDefaults.buttonColors(TextColor1)
+                ) {
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(text = item, color = Milk)
                 }
@@ -305,7 +287,7 @@ fun ModelInfo(navController: NavHostController) {
             OutlinedTextField(
                 value = sizeOfDefaultDataset,
                 onValueChange = { newText ->
-                    if (newText.all { it.isDigit() }&& newText.length <= 2) {
+                    if (newText.all { it.isDigit() } && newText.length <= 2) {
                         sizeOfDefaultDataset = newText
                     }
                 },
@@ -313,18 +295,20 @@ fun ModelInfo(navController: NavHostController) {
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 modifier = Modifier.fillMaxWidth(0.2f)
             )
-            Spacer(modifier = Modifier
-                .weight(1f)
-                .fillMaxWidth())
+            Spacer(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+            )
             Button(
 
                 onClick = {
                     imageUri = createImageUri(context)
-                    imageUri.let{
+                    imageUri.let {
                         takeImage.launch(it)
                     }
                 },
-                modifier = Modifier.padding( top = 10.dp, end = 12.dp),
+                modifier = Modifier.padding(top = 10.dp, end = 12.dp),
 
                 colors = ButtonDefaults.buttonColors(TextColor1)
 
@@ -336,18 +320,18 @@ fun ModelInfo(navController: NavHostController) {
                 )
             }
 
-        if (imageBitmap != null) {
-            bitmapList.add(imageBitmap)
-            imageBitmap = null
+            if (imageBitmap != null) {
+                bitmapList.add(imageBitmap)
+                imageBitmap = null
             }
         }
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(1f)
-                    .fillMaxHeight(0.8f)
-                    .padding(start = 8.dp, top = 10.dp, end = 12.dp, bottom = 10.dp)
-                    .shadow(2.dp, shape = RoundedCornerShape(10.dp))
-                ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth(1f)
+                .fillMaxHeight(0.8f)
+                .padding(start = 8.dp, top = 10.dp, end = 12.dp, bottom = 10.dp)
+                .shadow(2.dp, shape = RoundedCornerShape(10.dp))
+        ) {
             bitmapList.forEach {
                 it?.asImageBitmap()?.let { bitmap ->
                     Image(bitmap = bitmap, contentDescription = "Image", modifier = Modifier
@@ -374,9 +358,9 @@ fun ModelInfo(navController: NavHostController) {
                                 uploadComplete = "Model Id already exists"
                             }
                         }
-                    }
-                    else {
-                        Toast.makeText(context, "Please fill all the fields", Toast.LENGTH_SHORT).show()
+                    } else {
+                        Toast.makeText(context, "Please fill all the fields", Toast.LENGTH_SHORT)
+                            .show()
                     }
                 }
             },
@@ -400,24 +384,27 @@ fun ModelInfo(navController: NavHostController) {
     }
 }
 
-fun checkModelId(modelId: String):Boolean {
+fun checkModelId(modelId: String): Boolean {
     return repo.checkModelId(modelId)
 }
 
-fun uploadFunction(sizeOfDefaultDataset: Int, context: Context,modelId:String,success:(Boolean) -> Unit ) {
-    if (!checkModelId(modelId))
-        {
-            repo.postModelInfo(
-                modelId,
-                "Yolov8",
-                itemList,
-                sizeOfDefaultDataset,
-                usersImages.toList().requireNoNulls(),
-                context
-            )
-            success(true)
-        }
-    else {
+fun uploadFunction(
+    sizeOfDefaultDataset: Int,
+    context: Context,
+    modelId: String,
+    success: (Boolean) -> Unit
+) {
+    if (!checkModelId(modelId)) {
+        repo.postModelInfo(
+            modelId,
+            "Yolov8",
+            itemList,
+            sizeOfDefaultDataset,
+            usersImages.toList().requireNoNulls(),
+            context
+        )
+        success(true)
+    } else {
         success(false)
     }
 }
@@ -479,7 +466,7 @@ fun ModelTopBackground(navController: NavHostController) {
         modifier = Modifier.padding(top = 16.dp)
     ) {
         IconButton(onClick = {
-                navController.navigate("ListObject")
+            navController.navigate("ListObject")
         }) {
             Icon(
                 imageVector = Icons.Rounded.ArrowBack,
