@@ -31,21 +31,26 @@ class FDKService : FirebaseMessagingService() {
 
         message.notification?.let {
             val title = message.data["title"].toString()
-            val mes = message.data["message"]?.split(".")!!
-            when(mes[0].toInt()){
-                1->sendNotification(mes[1],title,0,"Model")
-                2->sendNotification(mes[1],title,1,"Model")
+            val mes = message.data["message"]?.split(".")
+            Log.d("1111", "onMessageReceived: $title")
+            Log.d("1111", "onMessageReceived: $mes")
+            when(mes?.get(0)?.toInt()){
+                1->sendNotification(mes[1],title,0)
+                2->sendNotification(mes[1],title,1)
+//                4->{
+//
+//                }
             }
         }
     }
-    private fun sendNotification(message: String,title: String, channelId :Int,channelName:String) {
+    private fun sendNotification(message: String,title: String, channelId :Int) {
 
         val intent = Intent(this, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
         val pendingIntent: PendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE)
         val notificationChannel = NotificationChannel(
-            "channel$channelId", channelName, NotificationManager.IMPORTANCE_DEFAULT
+            "channel$channelId", "Model", NotificationManager.IMPORTANCE_HIGH
         )
         notificationManager.createNotificationChannel(notificationChannel)
         val notification = NotificationCompat.Builder(

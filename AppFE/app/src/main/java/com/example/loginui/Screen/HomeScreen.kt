@@ -25,6 +25,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -36,6 +37,7 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.navigation.NavHostController
 import com.example.loginui.FunctionSection
+import com.example.loginui.navigation.repo
 import com.example.loginui.ui.theme.DarkSpecStart
 import com.example.loginui.ui.theme.Milk
 import com.example.loginui.ui.theme.PurpleEnd
@@ -56,8 +58,11 @@ fun HomeScreen(navController: NavHostController) {
     ) { padding ->
         Box(modifier = Modifier.padding())
     }
-
-
+    LaunchedEffect(key1 = true) {
+        repo.updateModelList().let {
+            repo.setModel(it!!)
+        }
+    }
     Column(
         modifier = Modifier
             .background(color = WhiteColor)

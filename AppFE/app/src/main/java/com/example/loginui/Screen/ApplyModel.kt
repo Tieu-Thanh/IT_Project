@@ -195,11 +195,8 @@ fun UrlInputTextBox(navController: NavHostController, modelId: String) {
                 Button(
                     onClick = {
                         if (videoUri != null) {
-                            Log.d(TAG, "uri case: $videoUri")
                             repo.postVideo(videoUri!!, modelId, null, context)
                         } else {
-                            Log.d(TAG, "url case: $url")
-                            Log.d(TAG, "UrlInputTextBox: $modelId")
                             repo.postVideo(null, modelId, url, context)
                             url = ""
                         }

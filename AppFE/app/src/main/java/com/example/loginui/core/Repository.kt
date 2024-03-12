@@ -76,6 +76,8 @@ class Repository  {
         this.currentUser = user
     }
 
+
+
     fun createStorage(user_id:User, callback: (Boolean) -> Unit){
         apiService.createStorage(user_id).enqueue(object : Callback<ResponseBody>{
             override fun onResponse(call: Call<ResponseBody>, response: Response<ResponseBody>) {
@@ -165,21 +167,24 @@ class Repository  {
     }
 
     fun trainModel(modelId:String){
-        apiService.trainModel(Model(modelId)).enqueue(object : Callback<Void>{
-            override fun onResponse(call: Call<Void>, response: Response<Void>) {
-                if(response.isSuccessful){
-                    println("Model is training...")
+        createToken {token ->
+            print(token)
+            apiService.trainModel(Model(modelId,token)).enqueue(object : Callback<Void>{
+                override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                    if(response.isSuccessful){
+                        println("Model is training...")
+                    }
+                    else{
+                        println("Model Train Failed")
+                    }
                 }
-                else{
-                    println("Model Train Failed")
-                }
-            }
 
-            override fun onFailure(call: Call<Void>, t: Throwable) {
-                println("Model Train Failed")
-                print(t.message)
-            }
-        })
+                override fun onFailure(call: Call<Void>, t: Throwable) {
+                    println("Model Train Failed")
+                    print(t.message)
+                }
+            })
+        }
     }
 
     fun signup(email: String, password: String, callback: (Int, String) -> Unit) {
@@ -198,7 +203,9 @@ class Repository  {
 
     @SuppressLint("Recycle")
     fun postVideo(uri: Uri?, modelId: String, url:String?, context: Context){
+        val timeStamp = System.currentTimeMillis()
         val path = if (uri != null) {
+            val videoName = "video$timeStamp.mp4"
             val contentResolver = context.contentResolver
             val inputStream = contentResolver.openInputStream(uri)
             val requestBody = inputStream?.let {
@@ -209,7 +216,7 @@ class Repository  {
                     byteArray.size
                 )
             }
-            MultipartBody.Part.createFormData("video", "filename.mp4", requestBody!!)
+            MultipartBody.Part.createFormData("video", videoName, requestBody!!)
         } else {
             null
         }
@@ -228,7 +235,6 @@ class Repository  {
                 override fun onFailure(call: Call<Void>, t: Throwable) {
                     println("Error: ${t.message}")
                 }
-
             })
         }
     }
@@ -275,7 +281,13 @@ class Repository  {
             MultipartBody.Part.createFormData("images", file.name, requestFile)
         }
     }
-
+    fun checkModelId(modelId: String):Boolean{
+        Log.d("11111", "checkModelId: ${listModelResponse.models.size}")
+        Log.d("11111", "checkModelId: ${listModelResponse.models}")
+        return listModelResponse.models.any {
+            it.modelId == modelId
+        }
+    }
 
     fun setModel(ls:ListModelResponse){
         listModelResponse = ls

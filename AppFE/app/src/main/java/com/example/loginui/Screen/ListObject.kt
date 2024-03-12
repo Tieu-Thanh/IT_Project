@@ -59,7 +59,7 @@ fun ListObject(navController: NavHostController) {
         modifier = Modifier.background(color = WhiteColor)
     ){
         TopBackground(navController)
-        TextField()
+        ListTextField()
         ListObjectDisplay()
         ButtonAtScreenBottom(navController)
     }
@@ -96,7 +96,7 @@ fun TopBackground(navController: NavHostController) {
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
-fun TextField() {
+fun ListTextField() {
     var existsMessage by remember { mutableStateOf("") }
     var query by remember { mutableStateOf("") }
     Row(modifier = Modifier.padding(8.dp)) {
@@ -219,6 +219,7 @@ fun ButtonAtScreenBottom(navController: NavHostController) {
                 } else {
                     Toast.makeText(null, "Please enter at least one class", Toast.LENGTH_SHORT)
                         .show()
+                    return@Button
                 }
             },
             modifier = Modifier.align(Alignment.BottomCenter),

@@ -1,16 +1,18 @@
 package com.example.loginui.Screen
 
+import android.R.attr.singleLine
+
 import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
 import android.provider.MediaStore
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -19,6 +21,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.absoluteOffset
@@ -44,9 +47,12 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -66,14 +72,12 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.zIndex
 import androidx.navigation.NavHostController
-import com.example.loginui.data.ModelResource
 import com.example.loginui.navigation.repo
 import com.example.loginui.navigation.user
 import com.example.loginui.ui.theme.DarkSpecEnd
@@ -83,13 +87,11 @@ import com.example.loginui.ui.theme.Milk
 import com.example.loginui.ui.theme.TextColor1
 import com.example.loginui.ui.theme.WhiteColor
 import com.example.loginui.ui.theme.interFontFamily
-import java.time.Instant
-import java.util.Base64
-import com.example.loginui.navigation.repo
-import com.example.loginui.navigation.user
+
 
 val TAG = "ModelInfo"
 val usersImages = mutableListOf<Bitmap?>()
+
 
 @SuppressLint("MutableCollectionMutableState", "InvalidColorHexValue",
     "UnusedBoxWithConstraintsScope"
@@ -108,6 +110,7 @@ fun ModelInfo(navController: NavHostController) {
     var imageBitmap by remember { mutableStateOf<Bitmap?>(null) }
     var selectedImage by remember { mutableStateOf<Bitmap?>(null) }
     val context = LocalContext.current
+    var modelId by remember { mutableStateOf("") }
     val takeImage = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
     ) { isSuccess ->
@@ -239,8 +242,7 @@ fun ModelInfo(navController: NavHostController) {
                     )
                 }
                 Row(
-                    modifier = Modifier.padding(start = 8.dp)
-
+                    modifier = Modifier.padding(start = 8.dp, top = 8.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Rounded.PartyMode,
@@ -251,29 +253,28 @@ fun ModelInfo(navController: NavHostController) {
                         tint = GoldSand
                     )
                     Text(
-                        text = "Model: Yolov8",
+                        text = "Model Id: ",
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 20.sp
                     )
-                }
-                Row(
-                    modifier = Modifier.padding(start = 8.dp)
-
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.Check,
-                        contentDescription = "Model Info",
+                    TextField(
+                        value = modelId,
+                        onValueChange = { newName ->
+                            // Update the state with the new name
+                            modelId = newName
+                        },
+                        label = { Text("Model Name") }, // Label displayed on the text field
                         modifier = Modifier
-                            .size(25.dp)
-                            .padding(end = 3.dp, top = 2.dp),
-                        tint = GoldSand
-                    )
-                    Text(
-                        text = "Accuracy: ...",
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 20.sp
+                            .fillMaxWidth(0.4f) // Fill the max width of its parent
+                            .height(IntrinsicSize.Min),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Color.Transparent, // Optional: also make the border transparent when the field is focused
+                            // You can also adjust other colors like background, cursor color as needed
+                            unfocusedBorderColor = Color.Transparent, // Makes border transparent
+                        ),
+                        singleLine = true,
+                        textStyle = LocalTextStyle.current.copy(textAlign = TextAlign.Center)
                     )
                 }
             }
@@ -304,7 +305,7 @@ fun ModelInfo(navController: NavHostController) {
             OutlinedTextField(
                 value = sizeOfDefaultDataset,
                 onValueChange = { newText ->
-                    if (newText.all { it.isDigit() }) {
+                    if (newText.all { it.isDigit() }&& newText.length <= 2) {
                         sizeOfDefaultDataset = newText
                     }
                 },
@@ -363,8 +364,20 @@ fun ModelInfo(navController: NavHostController) {
         Button(
             onClick = {
                 if (isVisible) {
-                    loading = true
-                    uploadFunction(sizeOfDefaultDataset.toInt(), context)
+                    if (modelId.isNotEmpty() && sizeOfDefaultDataset.isNotEmpty()) {
+                        uploadFunction(sizeOfDefaultDataset.toInt(), context, modelId) {
+                            if (it) {
+                                loading = true
+                                uploadComplete = "Upload complete"
+                            } else {
+                                loading = false
+                                uploadComplete = "Model Id already exists"
+                            }
+                        }
+                    }
+                    else {
+                        Toast.makeText(context, "Please fill all the fields", Toast.LENGTH_SHORT).show()
+                    }
                 }
             },
             Modifier
@@ -387,15 +400,26 @@ fun ModelInfo(navController: NavHostController) {
     }
 }
 
-fun uploadFunction(sizeOfDefaultDataset: Int, context: Context) {
-    repo.postModelInfo(
-        "CO",
-        "Yolov8",
-        itemList,
-        sizeOfDefaultDataset,
-        usersImages.toList().requireNoNulls(),
-        context
-    )
+fun checkModelId(modelId: String):Boolean {
+    return repo.checkModelId(modelId)
+}
+
+fun uploadFunction(sizeOfDefaultDataset: Int, context: Context,modelId:String,success:(Boolean) -> Unit ) {
+    if (!checkModelId(modelId))
+        {
+            repo.postModelInfo(
+                modelId,
+                "Yolov8",
+                itemList,
+                sizeOfDefaultDataset,
+                usersImages.toList().requireNoNulls(),
+                context
+            )
+            success(true)
+        }
+    else {
+        success(false)
+    }
 }
 
 
