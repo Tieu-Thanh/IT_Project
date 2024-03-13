@@ -9,7 +9,7 @@ from yolo import Model_YOLO
 
 # ### Example data ######
 classes = ['banana', 'orange']
-input_folder='/home/thekhoi/futme/IT_Project/detection/example/data_sample'
+input_folder='/home/thekhoi/futme/nháp/IT_Project/detection/example/data_sample'
 
 
 model1 = Model_YOLO()

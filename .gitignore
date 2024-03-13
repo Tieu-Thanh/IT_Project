@@ -6,6 +6,7 @@
 /api/*.json
 /env*
 /detection/data
+/detection/example/train
 /detection/__pycache__
 /detection/Images
 /AuGen/Images
@@ -14,3 +15,4 @@
 **/__pycache__/
 /runs
 /detectron2
+result*

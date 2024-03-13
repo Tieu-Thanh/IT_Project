@@ -18,7 +18,7 @@ class Model_YOLO():
 
     def _annotate_dataset(self, classes: list, input_folder: str, output_folder: str = None, extension: str = '.jpeg'):
         labeler = Labeler()
-        labeler.label_images(classes, input_folder)
+        labeler.label_images(classes, input_folder, extension=extension, output_folder=output_folder)
 
         output_folder = output_folder if output_folder else input_folder+'_labeled'
         data_yaml = os.path.join(output_folder, 'data.yaml')
@@ -63,16 +63,21 @@ class Model_YOLO():
             print("Can not load image, please re-check the source and try again.")
             return None
 
-        if len(self.classes) ==0 :
-            if len(classes) == 0:
-                print("Unknown class name. Please run again with classes.")
-                return None
-            else:
-                self.classes = classes
-
+        # if len(self.classes) ==0 :
+        #     if len(classes) == 0:
+        #         print("Unknown class name. Please run again with classes.")
+        #         return None
+        #     else:
+        #         self.classes = classes
+        self.classes = self.model.names
         results = self.model(image_source, save=True, imgsz=640, conf=0.5)
         bboxes = results[0].boxes.data
-        img_wbbox = draw_bbox(img, bboxes, self.classes)
+        detected_classes = list(bboxes[:, 5])
+        counts = {c: detected_classes.count(c) for c in set(detected_classes)}
+        counts_classes = {self.classes[int(k)]: v for k, v in counts.items()}
+        counts_classes_str = '\n'.join([f"{k}: {v}" for k, v in counts_classes.items()])
+        # print(counts_classes)
+        img_wbbox = draw_bbox(img, bboxes, self.classes, counts_classes_str)
 
         outpath = 'result.jpeg'
         cv2.imwrite(outpath, img_wbbox)

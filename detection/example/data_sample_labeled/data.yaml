@@ -1,6 +1,0 @@
-names:
-- banana
-- orange
-nc: 2
-train: /home/thekhoi/futme/IT_Project/detection/example/data_sample_labeled/train/images
-val: /home/thekhoi/futme/IT_Project/detection/example/data_sample_labeled/valid/images

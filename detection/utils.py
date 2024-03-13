@@ -5,7 +5,7 @@ import numpy as np
 from ultralytics.utils.plotting import Annotator, colors
 
 
-def draw_bbox(image, preds, classes , hide_conf=False, hide_labels=False):
+def draw_bbox(image, preds, classes , hide_conf=False, hide_labels=False, count_result = ""):
     '''
         Draw bounding box, for YOLO-type prediction
             `preds`: in each line: x1, y1, x2, y2, class
@@ -44,6 +44,12 @@ def draw_bbox(image, preds, classes , hide_conf=False, hide_labels=False):
         # else:
             # print(' xyxy,  cls:', xyxy, c )
         annotator.box_label(xyxy, label, color=colors(c, True))
+
+    # TODO: Write count_result on to image #########
+        
+    # use this library: https://github.com/ultralytics/ultralytics/blob/main/ultralytics/utils/plotting.py#L296C1-L296C88
+    
+    #########
 
     img_with_bboxes = annotator.result()
     return img_with_bboxes
