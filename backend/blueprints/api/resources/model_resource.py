@@ -10,24 +10,31 @@ from blueprints.detection.yolo import Model_YOLO
 from firebase_admin import storage, messaging
 from flask import request
 from flask_restful import Resource, reqparse
+from firebase_admin import firestore
 
-
-def send_notification_to_device(token, title, body):
+def send_notification_to_device(token, title, body,url=""):
     # See documentation on defining a message payload at
     # https://firebase.google.com/docs/cloud-messaging/admin/send-messages
-    message = messaging.Message(
-        notification=messaging.Notification(
-            title=title,
-            body=body,
-        ),
-        token=token,
-    )
+    print("get token",token)
+    try:
 
-    # Send a message to the device corresponding to the provided
-    # registration token with the message payload.
-    response = messaging.send(message)
-    return response
+        message = messaging.Message(
+            notification=messaging.Notification(
+                title=title,
+                body=body,
+            ),
+            token=token,
+            data={
+                'url': url
+            }
+        )
+        # Send a message to the device corresponding to the provided
+        # registration token with the message payload.
+        response = messaging.send(message)
+        return response
 
+    except Exception as e:
+        return {"error": e}, 500
 
 class ModelResource(Resource):
     def __init__(self):
@@ -38,58 +45,57 @@ class ModelResource(Resource):
         self.parser.add_argument('classes', type=str, action='append')
         self.parser.add_argument('crawl_number', type=int)
         self.parser.add_argument('token', type=str)
-
+    def checkExist(self,model_id):
+        db = firestore.client()
+        model_ref = db.collection('models').document(model_id)
+        model_doc = model_ref.get()
+        return model_doc.exists
     def post(self):
-        args = self.parser.parse_args()
-        model_id = args['model_id']
-        user_id = args['user_id']
-        model_name = args['model_name']
-        classes = args['classes']
-        crawl_number = args['crawl_number']
-        token = args['token']
+        try:
+            args = self.parser.parse_args()
+            model_id = args['model_id']
+            user_id = args['user_id']
+            model_name = args['model_name']
+            classes = args['classes']
+            crawl_number = args['crawl_number']
+            token = args['token']
 
-        # Create Storage folder
-        bucket = storage.bucket()
-        size = self.folder_size(bucket, f"{user_id}") - 1
-        model_id = model_id + str(size)
-        blob = bucket.blob(f"{user_id}/{model_id}/.ignore")
-        blob.upload_from_string('', content_type='text/plain')
+            if self.checkExist(model_id):
+                return {'message': 'Model already exists'}, 400
+            # Create Storage folder
+            bucket = storage.bucket()
 
-        # Crawl images
-        BASE_DIR = os.getenv("BASE_DIR", Path(__file__).resolve().parent.parent.parent)
-        img_folder = os.path.join(BASE_DIR, "detection", "Images", f"{user_id}", f"{model_id}")
+            blob = bucket.blob(f"{user_id}/{model_id}/.ignore")
+            blob.upload_from_string('', content_type='text/plain')
 
-        crawler = Crawler()
-        images = crawler.crawl(classes, crawl_number)
-        crawler.download_images(images, download_folder=img_folder)
+            # Crawl images
+            BASE_DIR = os.getenv("BASE_DIR", Path(__file__).resolve().parent.parent.parent)
+            img_folder = os.path.join(BASE_DIR, "detection", "Images", f"{user_id}", f"{model_id}")
 
-        # creating a Model instance
-        model = Model(
-            model_id=model_id,
-            user_id=user_id,
-            model_name=model_name,
-            classes=classes,
-            crawl_number=crawl_number,
-            status=1,
-            img_urls=[]  # This contains URLs from Firebase
-        )
-        model.save_to_db()
-        title = f"{model.status}.{model_id} created"
-        body = "Your model data has been created successfully, await to train"
-
-        print(send_notification_to_device(token, title, body))
-        return {
-            'message': 'Model created successfully',
-            'model': model.to_dict()
-        }, 201
+            # creating a Model instance
+            model = Model(
+                model_id=model_id,
+                user_id=user_id,
+                model_name=model_name,
+                classes=classes,
+                crawl_number=crawl_number,
+                status=1,
+                img_urls=[]  # This contains URLs from Firebase
+            )
+            model.save_to_db()
+            crawler = Crawler()
+            images = crawler.crawl(classes, crawl_number)
+            crawler.download_images(images, download_folder=img_folder)
+            title = f"{model.status}.{model_id} created"
+            body = "Your model data has been created successfully, await to train"
+            print(send_notification_to_device(token, title, body))
+            return {
+                'message': 'Model created successfully',
+                'model': model.to_dict()
+            }, 201
+        except Exception as e:
+            return {'message': str(e)}, 500
         # Respond with success message and any relevant data
-
-    def folder_size(self, bucket, folder_path) -> int:
-        blobs = bucket.list_blobs(prefix=folder_path)
-        size = 0
-        for _ in blobs:
-            size += 1
-        return size
 
     def get(self):
         try:
@@ -98,6 +104,7 @@ class ModelResource(Resource):
             return {'models': models}, 201
         except Exception as e:
             return {'message': str(e)}, 500
+
 
 
 class ModelDetailResource(Resource):
@@ -125,22 +132,25 @@ class ModelDetailResource(Resource):
 
 class ModelImages(Resource):
     def post(self, model_id):
-        images = request.files.getlist('images')
-        # Retrieve the model from Firestore
-        model = Model.get_model_detail(model_id)
-        if model is None:
-            return {"message": "Model not found"}, 404
+        try:
+            images = request.files.getlist('images')
+            # Retrieve the model from Firestore
+            model = Model.get_model_detail(model_id)
+            if model is None:
+                return {"message": "Model not found"}, 404
 
-        # Upload images to Firebase Storage and get URLs
-        img_urls = Model.save_images_to_url(model.user_id, model.model_id, images)
+            # Upload images to Firebase Storage and get URLs
+            img_urls = Model.save_images_to_url(model.user_id, model.model_id, images)
 
-        # Update the model's img_urls attribute
-        model.img_urls += img_urls  # Append new URLs to existing list
-        model.save_to_db()
+            # Update the model's img_urls attribute
+            model.img_urls += img_urls  # Append new URLs to existing list
+            model.save_to_db()
 
-        return {"message": "Images uploaded and model updated successfully",
-                "img_urls": img_urls,
-                "model": model.to_dict()}, 200
+            return {"message": "Images uploaded and model updated successfully",
+                    "img_urls": img_urls,
+                    "model": model.to_dict()}, 200
+        except Exception as e:
+            return {"message": str(e)}, 500
 
 
 class ModelVideoResource(Resource):
@@ -181,34 +191,44 @@ class ModelVideoResource(Resource):
 
     def detect_video(self, token, model_data, video_data):
         # resources/Images/{user_id}/{model_id}
+        try:
+            BASE_DIR = os.getenv("BASE_DIR", Path(__file__).resolve().parent.parent.parent)
+            print(BASE_DIR)
+            script_dir = os.path.join(BASE_DIR, "detection")
+            model_folder = os.path.join(script_dir,
+                                        "Images",
+                                        f"{model_data['user_id']}",
+                                        f"{model_data['model_id']}")
+            model_file = os.path.join(model_folder+"_model", "train", "weights", "best.pt")
+            print(model_file)
+            # Create path
+            if not os.path.exists(model_file):
+                # os.makedirs(model_file, exist_ok=True)
+                return {"error": "Model file does not exists"}, 404
 
-        BASE_DIR = os.getenv("BASE_DIR", Path(__file__).resolve().parent.parent.parent)
-        script_dir = os.path.join(BASE_DIR, "detection")
-        model_folder = os.path.join(script_dir,
-                                    "Images",
-                                    f"{model_data['user_id']}",
-                                    f"{model_data['model_id']}")
-        model_file = os.path.join(model_folder+"_model", "train", "weights", "best.pt")
+            yolo = Model_YOLO(model_file)
+            video_path = os.path.join(model_folder+"_model", "detection_result")
+            if not os.path.exists(video_path):
+                os.makedirs(video_path, exist_ok=True)
+            print(video_path)
+            download_file_from_storage(video_data['url'], video_path)
+            print(video_path)
+            # yolo.detect_video(video_path)
 
-        # Create path
-        if not os.path.exists(model_file):
-            # os.makedirs(model_file, exist_ok=True)
-            return {"error": "Model file does not exists"}, 404
+            video_source = os.path.join(video_path,video_data['video_id'])
+            video_file = self.create_video_file_mock(self.takeVideo(video_source))
+            output_url = self.uploadVideo("detection_result", video_file, model_data)
 
-        yolo = Model_YOLO(model_file)
-        video_path = os.path.join(model_folder+"_model", "detection_result")
-        yolo.detect(video_data['url'],video_path,video_data['video_id'])
+            print("Video result uploaded successfully")
+            print(output_url)
 
-        video_source = os.path.join(video_path,video_data['video_id'])
-        video_file = self.create_video_file_mock(self.takeVideo(video_source))
+            tittle = f"{4}.{model_data['model_id']} status"
+            body = "Video detected successfully"
 
-        self.uploadVideo("detection_result", video_file, video_data)
-        print("Video result uploaded successfully")
-        tittle = f"{4}.{model_data['model_id']} status"
-        body = "Video detected successfully"
-        response = send_notification_to_device(token,tittle,body)
-        return response
-
+            print(send_notification_to_device(token,tittle,body,url=output_url))
+            return {"message": "Video detected successfully"}
+        except Exception as e:
+            return {"error": e}, 500
     def uploadVideo(self, folder_type, video_file, data):
         try:
             bucket = storage.bucket()
@@ -220,18 +240,21 @@ class ModelVideoResource(Resource):
         except Exception as e:
             return {"error": e}, 500
 
+
     def create_video_file_mock(self,video_path):
-        with open(video_path, 'rb') as file:
-            file_content = file.read()
+        try:
+            with open(video_path, 'rb') as file:
+                file_content = file.read()
 
-        video_stream = io.BytesIO(file_content)
-        video_file_mock = SimpleNamespace(
-            stream=video_stream,
-            filename=os.path.basename(video_path),
-            content_type='video/avi'
-        )
-
-        return video_file_mock
+            video_stream = io.BytesIO(file_content)
+            video_file_mock = SimpleNamespace(
+                stream=video_stream,
+                filename=os.path.basename(video_path),
+                content_type='video/avi'
+            )
+            return video_file_mock
+        except Exception as e:
+            return {"error": e}, 500
     def get(self, model_id):
         """
         Retrieve videos for a given model_id by utilizing the Model class method.

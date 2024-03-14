@@ -8,14 +8,13 @@ from flask_restful import Resource, reqparse
 import shutil
 
 from blueprints.api.models.Model import Model
-from .model_resource import send_notification_to_device
 
 from blueprints.detection.yolo import Model_YOLO
 from utils.tasks import train_yolo_model
-
+from .model_resource import send_notification_to_device
 
 # helper functions
-def download_image_from_storage(url, local_path):
+def download_file_from_storage(url, local_path):
     try:
         blob_name = url.replace("https://storage.googleapis.com/chuyen-de-nghien-cuu.appspot.com/", "")
         bucket = storage.bucket()
@@ -54,7 +53,7 @@ class YoloResource(Resource):
             # Check dir exists
             if not os.path.exists(img_folder):
                 os.makedirs(img_folder, exist_ok=True)
-
+            print(img_folder)
             # Get images of model
             urls = model.img_urls
             if len(urls) != 0:
@@ -64,7 +63,7 @@ class YoloResource(Resource):
                     filename = filename_without_extension + '.jpg'
 
                     local_path = os.path.join(img_folder, filename)
-                    download_image_from_storage(url, local_path)
+                    download_file_from_storage(url, local_path)
 
             # Train Model YOLO
             model.update_status(2)
@@ -82,7 +81,7 @@ class YoloResource(Resource):
     def removeFile(self, file_path):
         try:
             shutil.rmtree(f"{file_path}_labeled")
-            shutil.rmtree(f"{file_path}_model")
+            shutil.rmtree(f"{file_path}")
             print("Clear image folder")
         except Exception as e:
             print(f"Error: {e}")

@@ -1,6 +1,6 @@
 import os
+from flask import Flask,jsonify
 
-from flask import Flask
 import firebase_admin
 from firebase_admin import credentials, firestore, storage
 from utils.extensions import db, bucket
@@ -28,8 +28,15 @@ def create_app():
     def hello_world():
         return 'Hello, World!'
 
+    @app.errorhandler(500)
+    def handle_500_error(error):
+        response = jsonify({
+            'message': 'Error!',
+            'error': str(error)
+        })
+        response.status_code = 500
+        return response
     return app
-
 
 app = create_app()
 
