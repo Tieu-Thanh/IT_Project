@@ -36,6 +36,10 @@
             </intent-filter>
 
         </activity>
+        <activity android:name=".DisplayVideoActivity"
+            android:label="ZKDetect"
+            android:theme="@style/Theme.LoginUI"
+            />
         <service
             android:name=".core.FDKService"
             android:exported="false"

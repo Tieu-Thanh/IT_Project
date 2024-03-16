@@ -1,12 +1,14 @@
 package com.example.loginui.Screen
 
+import android.content.IntentFilter
 import android.net.Uri
-import android.util.Log
+import android.os.Build
 import android.view.ViewGroup
 import android.widget.MediaController
 import android.widget.VideoView
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -20,12 +22,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.ArrowForward
 import androidx.compose.material.icons.rounded.ArrowUpward
-import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Mail
 import androidx.compose.material.icons.rounded.PartyMode
 import androidx.compose.material3.Button
@@ -36,6 +36,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -74,7 +75,6 @@ fun UrlInputTextBox(navController: NavHostController, modelId: String) {
     Column(
         modifier = Modifier.background(Color.White)
     ) {
-
         val isClick = remember { mutableStateOf(false) }
         var videoUri by remember { mutableStateOf<Uri?>(null) }
         var videoReady by remember { mutableStateOf(false) }
@@ -123,25 +123,6 @@ fun UrlInputTextBox(navController: NavHostController, modelId: String) {
                     Text(
                         text = "Model: ${model.modelId}",
 
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 20.sp
-                    )
-                }
-                Row(
-                    modifier = Modifier.padding(start = 8.dp)
-
-                ) {
-                    Icon(
-                        imageVector = Icons.Rounded.Check,
-                        contentDescription = "Model Info",
-                        modifier = Modifier
-                            .size(25.dp)
-                            .padding(end = 3.dp, top = 2.dp),
-                        tint = GoldSand
-                    )
-                    Text(
-                        text = "Accuracy: ...",
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.SemiBold,
                         fontSize = 20.sp
@@ -248,20 +229,6 @@ fun UrlInputTextBox(navController: NavHostController, modelId: String) {
                     }
                 }
             }
-        }
-        print(url)
-        Button(
-            onClick = {
-                val encodedUrl = URLEncoder.encode(url, StandardCharsets.UTF_8.toString())
-                navController.navigate("UrlVideoPopUp/$encodedUrl")
-            }, modifier = Modifier
-                .fillMaxWidth()
-                .height(70.dp)
-                .padding(start = 64.dp, end = 64.dp, top = 8.dp, bottom = 8.dp),
-            colors = ButtonDefaults.buttonColors(TextColor1),
-            shape = RoundedCornerShape(50)
-        ) {
-            Icon(imageVector = Icons.Rounded.ArrowForward, contentDescription = "UP", tint = Milk)
         }
         Image(
             painter = painterResource(id = R.drawable.bottom_background),

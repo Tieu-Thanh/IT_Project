@@ -108,6 +108,7 @@ fun ModelInfo(navController: NavHostController) {
     var selectedImage by remember { mutableStateOf<Bitmap?>(null) }
     val context = LocalContext.current
     var modelId by remember { mutableStateOf("") }
+    var success by remember { mutableStateOf(false) }
     val takeImage = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture()
     ) { isSuccess ->
@@ -170,7 +171,7 @@ fun ModelInfo(navController: NavHostController) {
                 onAnimationEnd = {
                     if (!it) {
                         loading = false
-                        uploadComplete = "Upload complete"
+                        uploadComplete = "Upload Complete"
                     }
                 }
             )
@@ -348,15 +349,10 @@ fun ModelInfo(navController: NavHostController) {
         Button(
             onClick = {
                 if (isVisible) {
-                    if (modelId.isNotEmpty() && sizeOfDefaultDataset.isNotEmpty()) {
+                    loading = true
+                    if (modelId.isNotEmpty() && sizeOfDefaultDataset.isNotEmpty() && sizeOfDefaultDataset.toInt() > 0) {
                         uploadFunction(sizeOfDefaultDataset.toInt(), context, modelId) {
-                            if (it) {
-                                loading = true
-                                uploadComplete = "Upload complete"
-                            } else {
-                                loading = false
-                                uploadComplete = "Model Id already exists"
-                            }
+                            success = it
                         }
                     } else {
                         Toast.makeText(context, "Please fill all the fields", Toast.LENGTH_SHORT)
@@ -384,29 +380,26 @@ fun ModelInfo(navController: NavHostController) {
     }
 }
 
-fun checkModelId(modelId: String): Boolean {
-    return repo.checkModelId(modelId)
-}
-
 fun uploadFunction(
     sizeOfDefaultDataset: Int,
     context: Context,
     modelId: String,
     success: (Boolean) -> Unit
 ) {
-    if (!checkModelId(modelId)) {
-        repo.postModelInfo(
-            modelId,
-            "Yolov8",
-            itemList,
-            sizeOfDefaultDataset,
-            usersImages.toList().requireNoNulls(),
-            context
-        )
-        success(true)
-    } else {
-        success(false)
+
+    repo.postModelInfo(
+        modelId,
+        "Yolov8",
+        itemList,
+        sizeOfDefaultDataset,
+        usersImages.toList().requireNoNulls(),
+        context
+    ){
+        if (!it)
+            success(true)
+
     }
+
 }
 
 

@@ -17,7 +17,6 @@ import com.example.loginui.Screen.ModelInfo
 import com.example.loginui.Screen.SignIn
 import com.example.loginui.Screen.SignUp
 import com.example.loginui.Screen.UrlInputTextBox
-import com.example.loginui.Screen.UrlVideoPopUp
 import com.example.loginui.SubScreen.UserModels
 import com.example.loginui.SubScreen.Contact_us
 import com.example.loginui.SubScreen.News
@@ -66,12 +65,6 @@ fun SetupNavGraph(navController: NavHostController) {
         composable("ApplyModel/{modelId}"){
             backstackEntry->
             UrlInputTextBox(navController = navController,modelId = backstackEntry.arguments?.getString("modelId")!!)
-        }
-        composable(
-            "UrlVideoPopUp/{url}"
-        ) { backStackEntry ->
-
-            UrlVideoPopUp(navController = navController, url = backStackEntry.arguments?.getString("url")!!)
         }
     }
 }

@@ -52,17 +52,11 @@ import com.example.loginui.ui.theme.interFontFamily
 fun HomeScreen(navController: NavHostController) {
     Scaffold(
         bottomBar = {
-
-
         }
     ) { padding ->
         Box(modifier = Modifier.padding())
     }
-    LaunchedEffect(key1 = true) {
-        repo.updateModelList().let {
-            repo.setModel(it!!)
-        }
-    }
+
     Column(
         modifier = Modifier
             .background(color = WhiteColor)

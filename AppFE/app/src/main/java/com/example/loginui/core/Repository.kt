@@ -94,7 +94,7 @@ class Repository  {
     }
 
 
-    fun postModelInfo(modelId: String,modelName: String, classes:List<String>, dataSize:Int, bitmaps: List<Bitmap>,context: Context){
+    fun postModelInfo(modelId: String,modelName: String, classes:List<String>, dataSize:Int, bitmaps: List<Bitmap>,context: Context,success: (Boolean) -> Unit){
         createToken { token ->
             val modelDetail = ModelResource(
                 modelId,
@@ -106,11 +106,13 @@ class Repository  {
             )
             apiService.postModelInfo(modelDetail).enqueue(object : Callback<Void>{
                 override fun onResponse(call: Call<Void>, response: Response<Void>) {
+                    if (response.code() == 400) {
+                        success(false)
+                    }
                 }
                 override fun onFailure(call: Call<Void>, t: Throwable) {
                     if (bitmaps.isNotEmpty()) {
                         postUserImage(bitmaps, context, modelDetail.modelId)
-                        println("Image Uploaded")
                     }
                 }
             })
@@ -125,6 +127,8 @@ class Repository  {
             token(task.result)
         }
     }
+
+
     suspend fun updateModelList():ListModelResponse? = suspendCancellableCoroutine{
             continuation ->
         apiService.getModelList(currentUser).enqueue(object : Callback<ListModelResponse> {
@@ -278,13 +282,6 @@ class Repository  {
             val file = bitmapToFile(bitmap, context)
             val requestFile = file.asRequestBody("image/jpeg".toMediaTypeOrNull())
             MultipartBody.Part.createFormData("images", file.name, requestFile)
-        }
-    }
-    fun checkModelId(modelId: String):Boolean{
-        Log.d("11111", "checkModelId: ${listModelResponse.models.size}")
-        Log.d("11111", "checkModelId: ${listModelResponse.models}")
-        return listModelResponse.models.any {
-            it.modelId == modelId
         }
     }
 
