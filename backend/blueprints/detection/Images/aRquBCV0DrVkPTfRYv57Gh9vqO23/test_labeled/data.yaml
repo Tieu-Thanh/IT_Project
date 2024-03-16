@@ -1,0 +1,5 @@
+names:
+- aa
+nc: 1
+train: D:\acc\IT_Project\backend\blueprints\detection\Images\aRquBCV0DrVkPTfRYv57Gh9vqO23\test_labeled/train/images
+val: D:\acc\IT_Project\backend\blueprints\detection\Images\aRquBCV0DrVkPTfRYv57Gh9vqO23\test_labeled/valid/images
