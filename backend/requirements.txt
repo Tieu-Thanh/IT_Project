@@ -1,0 +1,17 @@
+selenium~=4.15.2
+webdriver_manager
+beautifulsoup4~=4.12.2
+Pillow
+google-cloud-firestore
+google-cloud-storage
+flask
+flask-restful
+firebase-admin
+python-decouple
+requests
+roboflow
+ultralytics
+autodistill_grounded_sam
+celery
+redis
+aiohttp
