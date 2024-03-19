@@ -47,7 +47,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.loginui.MainActivity
 import com.example.loginui.R
-import com.example.loginui.Screen.notificationPermissionGranted
+
 import com.example.loginui.data.Model
 import com.example.loginui.data.ModelResource
 import com.example.loginui.navigation.repo

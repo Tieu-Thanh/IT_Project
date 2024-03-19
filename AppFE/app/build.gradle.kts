@@ -97,4 +97,5 @@ dependencies {
     implementation ("com.pierfrancescosoffritti.androidyoutubeplayer:chromecast-sender:0.28")
     implementation ("com.google.firebase:firebase-messaging:23.4.1")
     implementation ("androidx.constraintlayout:constraintlayout-compose:1.0.1")
+    implementation("com.google.accompanist:accompanist-permissions:0.33.1-alpha")
 }

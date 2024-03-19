@@ -57,7 +57,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.navigation.NavHostController
 import com.example.loginui.MainActivity
 import com.example.loginui.R
-import com.example.loginui.core.hasNotificationPermission
+
 import com.example.loginui.data.authen.SignInRequest
 import com.example.loginui.data.authen.SignInResponse
 import com.example.loginui.navigation.repo
@@ -193,7 +193,7 @@ fun SignIn(navController: NavHostController) {
                     if (it) {
                         user = email
                         repo.updateCurrentUser(user)
-                        navController.navigate("Home")
+                        navController.navigate("HomeScreen")
                     }
                     else{
                         Toast.makeText(context, "Login Failed", Toast.LENGTH_LONG).show()

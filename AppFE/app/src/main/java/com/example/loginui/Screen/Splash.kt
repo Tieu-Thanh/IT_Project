@@ -51,7 +51,7 @@ fun AnimatedSplash(navController: NavHostController) {
     LaunchedEffect(key1 = true) {
         startAnimation = true
         delay(4000)
-        navController.navigate("SignIn")
+        navController.navigate("TurnOnNoti")
     }
     Splash(alpha = alphaAnim.value)
 }
