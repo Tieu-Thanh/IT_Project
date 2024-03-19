@@ -72,6 +72,7 @@ import java.nio.charset.StandardCharsets
 @Composable
 fun UrlInputTextBox(navController: NavHostController, modelId: String) {
     val model = repo.getModel(modelId)
+
     Column(
         modifier = Modifier.background(Color.White)
     ) {

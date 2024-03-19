@@ -1,5 +1,7 @@
 package com.example.loginui.Screen
 
+import android.Manifest
+import android.os.Build
 import androidx.compose.ui.text.input.VisualTransformation
 import android.util.Log
 import android.widget.Toast
@@ -47,7 +49,9 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.ActivityCompat
 import androidx.navigation.NavHostController
+import com.example.loginui.MainActivity
 import com.example.loginui.R
 import com.example.loginui.data.User
 import com.example.loginui.navigation.repo
@@ -60,6 +64,7 @@ import kotlin.math.log
 
 @Composable
 fun SignUp(navController: NavHostController) {
+    val context = LocalContext.current
     Column(
         Modifier
             .background(color = WhiteColor)
@@ -67,8 +72,11 @@ fun SignUp(navController: NavHostController) {
             .fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+
         val passwordVisibility = remember { mutableStateOf(false) }
         val retypeVisibility = remember { mutableStateOf(false) }
+
+
         Image(
             painter = painterResource(id = R.drawable.top_background),
             contentDescription = null,
@@ -258,7 +266,7 @@ fun SignUp(navController: NavHostController) {
                 Text(text = "Retype your password", color = TextColor1, fontFamily = interFontFamily)
             },
         )
-        val context = LocalContext.current
+
         Button(
             onClick = {
                     repo.signup(email, pass) {code, idToken ->

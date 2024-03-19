@@ -1,8 +1,12 @@
 package com.example.loginui.Screen
 
 
+import android.Manifest
+import android.os.Build
+
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -48,8 +52,12 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.app.ActivityCompat
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.navigation.NavHostController
+import com.example.loginui.MainActivity
 import com.example.loginui.R
+import com.example.loginui.core.hasNotificationPermission
 import com.example.loginui.data.authen.SignInRequest
 import com.example.loginui.data.authen.SignInResponse
 import com.example.loginui.navigation.repo
@@ -185,9 +193,9 @@ fun SignIn(navController: NavHostController) {
                     if (it) {
                         user = email
                         repo.updateCurrentUser(user)
-                        navController.navigate("HomeScreen")
-                        Toast.makeText(context, "Login Success", Toast.LENGTH_LONG).show()
-                    } else {
+                        navController.navigate("Home")
+                    }
+                    else{
                         Toast.makeText(context, "Login Failed", Toast.LENGTH_LONG).show()
                     }
                 }
@@ -250,6 +258,5 @@ fun SignIn(navController: NavHostController) {
             contentScale = ContentScale.FillBounds
 
         )
-
     }
 }

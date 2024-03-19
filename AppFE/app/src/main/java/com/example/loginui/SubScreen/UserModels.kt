@@ -1,6 +1,8 @@
 package com.example.loginui.SubScreen
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -31,6 +33,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
@@ -42,7 +45,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.loginui.MainActivity
 import com.example.loginui.R
+import com.example.loginui.Screen.notificationPermissionGranted
+import com.example.loginui.data.Model
 import com.example.loginui.data.ModelResource
 import com.example.loginui.navigation.repo
 import com.example.loginui.navigation.user
@@ -50,19 +56,22 @@ import com.example.loginui.ui.theme.DarkSpecEnd
 import com.example.loginui.ui.theme.DarkSpecStart
 import com.example.loginui.ui.theme.GoldSand
 import com.example.loginui.ui.theme.interFontFamily
+import kotlinx.coroutines.launch
 
 @SuppressLint("UnrememberedMutableState")
 @Composable
 fun UserModels(navController: NavHostController) {
     val modelList = remember { mutableStateListOf<ModelResource>() }
-
+    val coroutineScope = rememberCoroutineScope()
     val context = LocalContext.current
     LaunchedEffect(key1 = true) {
-        repo.updateModelList().let {
-            repo.setModel(it!!)
+        coroutineScope.launch {
+            try {
+                updateModelList(modelList)
+            } catch (e: Exception) {
+                Log.e("Error", "UserModels: $e", )
+            }
         }
-        modelList.clear()
-        modelList.addAll(repo.getModelList().models)
     }
     Column (
         modifier = Modifier.background(Color.White)
@@ -76,30 +85,11 @@ fun UserModels(navController: NavHostController) {
                     .fillMaxWidth()
                     .background(color!!)
                     .clickable {
-                        when (modelResource.status) {
-                            0 -> {
-                                Toast
-                                    .makeText(context, "Data is not ready yet", Toast.LENGTH_SHORT)
-                                    .show()
-                            }
-
-                            1 -> {
-                                repo.trainModel(modelResource.modelId)
-                                Toast
-                                    .makeText(context, "Start Training", Toast.LENGTH_SHORT)
-                                    .show()
-                            }
-
-                            2 -> Toast
-                                .makeText(context, "Model is training", Toast.LENGTH_SHORT)
-                                .show()
-
-                            3 ->
-                                navController.navigate("ApplyModel/${modelResource.modelId}")
+                        coroutineScope.launch {
+                            onModelClick(modelResource,context,navController,modelList)
                         }
                     }
                 ) {
-
                     Box(
                         modifier = Modifier
 
@@ -260,6 +250,27 @@ fun UserModels(navController: NavHostController) {
 
 }
 
+suspend fun onModelClick(model: ModelResource,context: Context,navController: NavHostController,modelList: MutableList<ModelResource>){
+    when (model.status) {
+        0 -> Toast.makeText(context, "Data is not ready yet", Toast.LENGTH_SHORT).show()
+        1 -> {
+            repo.trainModel(model.modelId)
+            Toast.makeText(context, "Start Training", Toast.LENGTH_SHORT).show()
+        }
+        2 -> Toast.makeText(context, "Model is training", Toast.LENGTH_SHORT).show()
+        3 -> navController.navigate("ApplyModel/${model.modelId}")
+    }
+    updateModelList(modelList)
+}
+suspend fun updateModelList(modelList:MutableList<ModelResource>) {
+    // Assuming updateModelList is a suspend function that updates the model's status
+    repo.updateModelList().let {
+        repo.setModel(it!!)
+    }
+    modelList.clear()
+    modelList.addAll(repo.getModelList().models)
+}
+
 @Composable
 fun getColorByStatus(status: Int): Color {
     return when (status) {
@@ -306,8 +317,5 @@ fun UserModelsTopBackground(navController: NavHostController) {
                 textAlign = TextAlign.Center
             )
         }
-
     }
-
-
 }

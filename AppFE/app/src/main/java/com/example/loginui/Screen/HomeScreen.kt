@@ -1,6 +1,11 @@
 package com.example.loginui.Screen
 
-
+import android.Manifest
+import android.content.Context
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -25,19 +30,26 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
+import androidx.core.app.ComponentActivity
 import androidx.navigation.NavHostController
 import com.example.loginui.FunctionSection
-import com.example.loginui.navigation.repo
+import com.example.loginui.MainActivity
+import com.example.loginui.core.hasNotificationPermission
 import com.example.loginui.ui.theme.DarkSpecStart
 import com.example.loginui.ui.theme.Milk
 import com.example.loginui.ui.theme.PurpleEnd
@@ -56,6 +68,14 @@ fun HomeScreen(navController: NavHostController) {
     ) { padding ->
         Box(modifier = Modifier.padding())
     }
+    var permissionGranted by remember { mutableStateOf(false) }
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission(),
+        onResult = { isGranted ->
+            // Cập nhật trạng thái quyền dựa vào kết quả
+            permissionGranted = isGranted
+        }
+    )
 
     Column(
         modifier = Modifier
@@ -284,4 +304,8 @@ fun HomeScreen(navController: NavHostController) {
         FunctionSection(navController)
 
     }
+}
+
+fun notificationPermissionGranted(activity: ComponentActivity) {
+
 }
