@@ -19,7 +19,7 @@ class Model_YOLO():
     def _annotate_dataset(self, classes: list, input_folder: str, output_folder: str = None, extension: str = '.jpeg'):
         labeler = Labeler()
         labeler.label_images(classes, input_folder, extension=extension, output_folder=output_folder)
-
+        print("aaa")
         output_folder = output_folder if output_folder else input_folder+'_labeled'
         data_yaml = os.path.join(output_folder, 'data.yaml')
         return data_yaml
@@ -34,7 +34,7 @@ class Model_YOLO():
         '''
         self.classes = classes
         self.data_yaml = self._annotate_dataset(classes, input_folder, output_folder, extension) # produce a dataset
- 
+        
         self.model.train(data = self.data_yaml,
                             epochs = 100,
                             optimizer='AdamW',
@@ -119,7 +119,6 @@ class Model_YOLO():
         zone = sv.PolygonZone(polygon=polygon, frame_resolution_wh=video_info.resolution_wh)
 
         # initiate annotators
-        box_annotator = sv.BoxAnnotator(thickness=4, text_thickness=4, text_scale=2)
         zone_annotator = sv.PolygonZoneAnnotator(zone=zone, color=sv.Color.WHITE, thickness=6, text_thickness=6, text_scale=4)
 
         model = self.model

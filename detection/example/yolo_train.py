@@ -9,11 +9,11 @@ from yolo import Model_YOLO
 
 # ### Example data ######
 classes = ['banana', 'orange']
-input_folder='/home/thekhoi/futme/nháp/IT_Project/detection/example/data_sample'
+input_folder=r'D:\acc\IT_Project\detection\example\data_sample'
 
 
 model1 = Model_YOLO()
 
 model1.train(classes, input_folder)
 
-model1.detect()
+# model1.detect()

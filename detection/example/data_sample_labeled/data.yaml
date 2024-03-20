@@ -1,0 +1,6 @@
+names:
+- banana
+- orange
+nc: 2
+train: D:\acc\IT_Project\detection\example\data_sample_labeled/train/images
+val: D:\acc\IT_Project\detection\example\data_sample_labeled/valid/images
