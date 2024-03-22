@@ -258,7 +258,6 @@ class ModelVideoResource(Resource):
             blob = bucket.blob(f"{data['user_id']}/{data['model_id']}/{folder_type}/" + video_file.filename)
             blob.upload_from_file(video_file.stream, content_type=video_file.content_type)
             url = blob.public_url
-            print(url)
             return url
         except Exception as e:
             return {"upload error": e}, 500

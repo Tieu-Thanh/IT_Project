@@ -48,8 +48,6 @@ class YoloResource(Resource):
                     filename = filename_without_extension + '.jpg'
 
                     local_path = os.path.join(img_folder, filename)
-                    print(url)
-                    print(local_path)
                     download_file_from_storage(url, local_path)
 
             # Train Model YOLO
@@ -57,8 +55,8 @@ class YoloResource(Resource):
             yolo = Model_YOLO()
             model_folder = f"{img_folder}_model"
             yolo.train(model.classes, input_folder=img_folder, extension='.jpg', save_dir=model_folder)
-            removeFile(img_folder)
-            removeFile(img_folder + '_labeled')
+            # removeFile(img_folder)
+            # removeFile(img_folder + '_labeled')
             model.update_status(3)
             send_notification_to_device(token, f"{model.status}.{model_id} status", "Model complete!")
             return {"message": "Model train successful",

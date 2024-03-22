@@ -2,8 +2,7 @@
 from ultralytics import YOLO
 import os
 from .autoannotate import Labeler
-import cv2
-from .utils import draw_bbox
+
 import numpy as np
 import supervision as sv
 
@@ -36,13 +35,14 @@ class Model_YOLO():
         '''
         self.classes = classes
         self.data_yaml = self._annotate_dataset(classes, input_folder, output_folder, extension)  # produce a dataset
-
+        #
         self.model.train(data=self.data_yaml,
                          epochs=100,
                          optimizer='AdamW',
                          imgsz=640,
                          project=save_dir,
                          exist_ok=True)
+        print("call")
 
     def detect(self, input_source):
         '''
