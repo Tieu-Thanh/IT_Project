@@ -12,7 +12,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.loginui"
-        minSdk = 27
+        minSdk = 33
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -23,7 +23,6 @@ android {
         buildConfigField("String", "API_KEY",System.getenv()["API_KEY"]?: properties["API_KEY"] as String)
         buildConfigField("String", "LOGIN_URL","${properties["LOGIN_URL"]}")
         buildConfigField("String", "LOCAL_URL", "${properties["LOCAL_URL"]}")
-
     }
 
     buildTypes {

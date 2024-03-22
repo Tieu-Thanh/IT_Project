@@ -14,7 +14,6 @@ import com.example.loginui.Screen.AnimatedSplash
 import com.example.loginui.Screen.HomeScreen
 import com.example.loginui.Screen.ListObject
 import com.example.loginui.Screen.ModelInfo
-import com.example.loginui.Screen.PermissionDemo
 import com.example.loginui.Screen.SignIn
 import com.example.loginui.Screen.SignUp
 import com.example.loginui.Screen.UrlInputTextBox
@@ -32,9 +31,6 @@ fun SetupNavGraph(navController: NavHostController) {
     ) {
         composable("AnimatedSplash") {
             AnimatedSplash(navController = navController)
-        }
-        composable("TurnOnNoti") {
-            PermissionDemo(navController = navController)
         }
         composable("SignIn") {
             SignIn(navController = navController)

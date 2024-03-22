@@ -41,6 +41,7 @@ fun AnimatedSplash(navController: NavHostController) {
     var startAnimation by remember {
         mutableStateOf(false)
     }
+
     val alphaAnim = animateFloatAsState(
         targetValue = if (startAnimation) 1f else 0f,
         animationSpec = tween(
@@ -51,7 +52,7 @@ fun AnimatedSplash(navController: NavHostController) {
     LaunchedEffect(key1 = true) {
         startAnimation = true
         delay(4000)
-        navController.navigate("TurnOnNoti")
+        navController.navigate("SignIn")
     }
     Splash(alpha = alphaAnim.value)
 }
@@ -101,7 +102,6 @@ fun SplashScreenView() {
 fun getGradient(
     startColor: Color,
     endColor: Color,
-
 ): Brush {
     return Brush.verticalGradient(
         colors = listOf(startColor, endColor)

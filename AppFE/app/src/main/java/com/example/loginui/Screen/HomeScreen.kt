@@ -3,6 +3,7 @@ package com.example.loginui.Screen
 import android.Manifest
 import android.content.Context
 import android.os.Build
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
@@ -30,6 +31,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -48,8 +50,7 @@ import androidx.core.app.ActivityCompat.shouldShowRequestPermissionRationale
 import androidx.core.app.ComponentActivity
 import androidx.navigation.NavHostController
 import com.example.loginui.FunctionSection
-import com.example.loginui.MainActivity
-import com.example.loginui.core.hasNotificationPermission
+
 import com.example.loginui.ui.theme.DarkSpecStart
 import com.example.loginui.ui.theme.Milk
 import com.example.loginui.ui.theme.PurpleEnd
@@ -58,25 +59,31 @@ import com.example.loginui.ui.theme.PurpleSpecStart
 import com.example.loginui.ui.theme.PurpleStart
 import com.example.loginui.ui.theme.WhiteColor
 import com.example.loginui.ui.theme.interFontFamily
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 
 
+@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun HomeScreen(navController: NavHostController) {
+    val notificationPermission = rememberPermissionState(
+        permission = Manifest.permission.POST_NOTIFICATIONS
+    )
+    val context = LocalContext.current
     Scaffold(
         bottomBar = {
         }
     ) { padding ->
         Box(modifier = Modifier.padding())
     }
-    var permissionGranted by remember { mutableStateOf(false) }
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission(),
-        onResult = { isGranted ->
-            // Cập nhật trạng thái quyền dựa vào kết quả
-            permissionGranted = isGranted
+    LaunchedEffect(key1 = true) {
+        if (!notificationPermission.status.isGranted) {
+            notificationPermission.launchPermissionRequest()
+        } else {
+            Toast.makeText(context, "Permission Given Already", Toast.LENGTH_SHORT).show()
         }
-    )
-
+    }
     Column(
         modifier = Modifier
             .background(color = WhiteColor)
@@ -304,8 +311,4 @@ fun HomeScreen(navController: NavHostController) {
         FunctionSection(navController)
 
     }
-}
-
-fun notificationPermissionGranted(activity: ComponentActivity) {
-
 }
