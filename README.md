@@ -39,5 +39,10 @@ Running android:
 9. Wait for the notification
 10. Get back to the home screen
 11. Click on the model you just trained (It should have status 1)
-12. Await it 
+12. Await it to train finish, it will pop notification when it's done
+13. Click on the model again
+14. Input the video
+15. Then click "START CALCULATE"
+16. Wait for the result, it will pop notification when it's done
+17. Click Check on the notification to see the video with the result
 
