@@ -1,15 +1,9 @@
-/myvenv/
+/venv/
 /images/
 /.vscode/
-/UML
 /backend/.idea
-/api/*.json
-/env*
-/detection/data
-/detection/__pycache__
-/detection/Images
-/AuGen/Images
+/backend/blueprints/detection/Images
 /.idea
 
-AppFE/gradle.properties
+/AppFE/gradle.properties
 
