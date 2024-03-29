@@ -201,7 +201,6 @@ fun UrlInputTextBox(navController: NavHostController, modelId: String) {
                         videoUri = uri
                     }
                 )
-
                 Button(
                     onClick = {
                         pickVideoLauncher.launch("video/*")

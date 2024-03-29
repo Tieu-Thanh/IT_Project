@@ -17,12 +17,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.ArrowForward
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -58,14 +61,28 @@ fun ListObject(navController: NavHostController) {
     Column (
         modifier = Modifier.background(color = WhiteColor)
     ){
+
+
         TopBackground(navController)
         ListTextField()
         ListObjectDisplay()
+        DeleteAllButton()
         ButtonAtScreenBottom(navController)
     }
 }
 
-
+@Composable
+fun DeleteAllButton(){
+    Button(
+        onClick = { itemList.clear() },
+        modifier = Modifier
+            .padding(bottom = 25.dp)
+            .fillMaxWidth(),
+        colors = ButtonDefaults.buttonColors(TextColor1)
+    ) {
+        Text("Clear All Items")
+    }
+}
 @Composable
 fun TopBackground(navController: NavHostController) {
     Row(
@@ -182,22 +199,35 @@ fun ListObjectDisplay() {
         LazyColumn(
             contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
         ) {
-            for (item in itemList) {
-                item {
+            itemsIndexed(itemList) { index, item ->
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp)
+                ){
                     Text(
                         text = item,
                         style = TextStyle(
                             color = Color.Black,
                             fontWeight = FontWeight.Bold,
                             fontSize = 20.sp,
-                            fontFamily = interFontFamily
-                        )
+                            fontFamily = interFontFamily,
+
+                        ),
+                        modifier = Modifier.weight(1f)
                     )
+                    IconButton(
+                        onClick = { itemList.removeAt(index) },
+                        modifier = Modifier.padding(start = 8.dp)
+                    ) {
+                         Icon(Icons.Filled.Delete, contentDescription = "Delete",tint = Color.Red)
+                    }
                 }
+                Divider(color = Color.LightGray, thickness = 1.dp)
             }
         }
     }
-
 }
 
 fun isValueInList(value: String, list: List<String>): Boolean {

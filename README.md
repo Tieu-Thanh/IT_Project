@@ -28,3 +28,17 @@ Access: http://127.0.0.1:5000/
 | ImageResource       | `/api/images`                              | List images of a model                                    | GET              | JSON: `{ "model_id": "789012", "image_id": "image_1", "url": "https://example.com/image_1.jpg", "roi_values": [1, 2] }` | JSON: `{ "message": "Image created successfully" }`                                                                                                                                                                                                                                    |
 | ImageDetailResource | `/api/models/{model_id}/images/{image_id}` | Retrieve details or update ROI values of a specific image | GET, PUT, DELETE | GET: None PUT: JSON: `{ "roi_values": [3, 4] }`                                                                         | GET: `{ "image_data": { "image_id": "image_1", "url": "https://example.com/image_1.jpg", "roi_values": [1, 2] } }` PUT: `{ "message": "Image updated successfully", "updated_image_data": { "image_id": "image_1", "url": "https://example.com/image_1.jpg", "roi_values": [3, 4] } }` |
 
+Running android:
+1. Open android studio
+2. Open the project
+3. Run the project
+4. Login, or sign up
+5. Allow notification access
+5. Choose function to use for the model
+6. Input the list of objects name
+7. Enter the model's name
+8. (Optional) Take the object's picture
+9. Wait for the notification
+10. Get back to the home screen
+11. Click on the model you just trained (It should have status 1)
+12. Await it 

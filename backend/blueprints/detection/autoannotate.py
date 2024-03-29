@@ -1,4 +1,4 @@
-from autodistill_detic import DETIC
+from autodistill_grounding_dino import GroundingDINO
 from autodistill.detection import CaptionOntology
 import argparse
 
@@ -31,7 +31,7 @@ class Labeler():
         description_label_map = dict(zip(classes, classes))
 
         print("Loading SAM model...")
-        base_model = DETIC(ontology=CaptionOntology(
+        base_model = GroundingDINO(ontology=CaptionOntology(
             description_label_map
         ))
 
