@@ -11,7 +11,7 @@ python-decouple
 requests
 roboflow
 ultralytics
-autodistill_grounded_sam
+autodistill_detic
 celery
 redis
 aiohttp
