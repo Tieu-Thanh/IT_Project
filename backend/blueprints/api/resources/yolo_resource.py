@@ -53,6 +53,7 @@ class YoloResource(Resource):
             # Train Model YOLO
             model.update_status(2)
             yolo = Model_YOLO()
+            print("aaaaaaaaaaaaa")
             model_folder = f"{img_folder}_model"
             yolo.train(model.classes, input_folder=img_folder, extension='.jpg', save_dir=model_folder)
             # removeFile(img_folder)

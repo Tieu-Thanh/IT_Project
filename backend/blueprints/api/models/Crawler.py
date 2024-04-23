@@ -5,7 +5,6 @@ from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from bs4 import BeautifulSoup
 from concurrent.futures import ThreadPoolExecutor
-# from api.models.Image import Image
 from .Image import Image
 
 
@@ -29,7 +28,7 @@ class Crawler:
             cls._driver_instance = webdriver.Chrome(options=options)
         return cls._driver_instance
 
-    def __scroll_down_page(self, times=2):
+    def __scroll_down_page(self, times=1):
         for _ in range(times):
             self.driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
             time.sleep(2)
@@ -38,28 +37,33 @@ class Crawler:
         images_list = []
         try:
             search_url = f'https://www.google.com/search?q={query.replace(" ", "+")}&tbm=isch'
-            self.driver.get(search_url)
+            print(search_url)
             time.sleep(5)
-
+            self.driver.get(search_url)
             self.__scroll_down_page(times=scroll_times)
 
             soup = BeautifulSoup(self.driver.page_source, 'html.parser')
+            def has_exact_class(tag, class_name):
+                # Check if the element's 'class' attribute exactly matches the provided class_name
+                return tag.has_attr('class') and tag['class'] == class_name.split()
 
-            image_container = soup.find(id='islrg')
-
+            # Find elements that have exactly "text" as their class
+            image_tags = soup.find_all(lambda tag: has_exact_class(tag, "YQ4gaf"))
             idx = 1
-            for raw_img in image_container.find_all('img'):
+            for img_tag in image_tags:
                 if idx > img_num:
                     break
 
-                link = raw_img.get('data-src')
-                if link and link.startswith("https://") and "images" in link:
-                    img_id = f"{idx}"
-
-                    image = Image(image_id=img_id, query=query.replace(" ", "_"), url=link)
+                src_link = img_tag.get('src')
+                if src_link and src_link.startswith("https://"):
+                    print(src_link, "\n")
+                    image = Image(image_id=idx, query=query.replace(" ", "_"), url=src_link)
                     images_list.append(image)
 
                     idx += 1
+
+                elif src_link and src_link.startswith("data:image"):
+                    continue  # Skip base64 images
 
         except Exception as e:
             print(f"An error occurred during crawling: {e}")
@@ -160,5 +164,6 @@ if __name__ == "__main__":
     HOME = os.getcwd()
     # print(HOME)
     img_folder = os.path.join(HOME, "detection", "Images")
+    print(img_folder)
     # print(img_folder)
     crawler.download_images(images_data, download_folder=img_folder)

@@ -11,26 +11,29 @@ class UserResource(Resource):
         # self.parser.add_argument('email', type=str, required=True)
 
     def post(self):
-        args = self.parser.parse_args()
-        user_id = args['user_id']
-        # email = args['email']
+        try:
+            args = self.parser.parse_args()
+            user_id = args['user_id']
+            # email = args['email']
 
-        # create User profile on Firestore
-        user_ref = self.db.collection('users').document(user_id)
-        user_ref.set({
-            'user_id': user_id,
-            # 'email': email
-        })
+            # create User profile on Firestore
+            user_ref = self.db.collection('users').document(user_id)
+            user_ref.set({
+                'user_id': user_id,
+                # 'email': email
+            })
 
-        # create User folder on Storage
-        bucket = storage.bucket()
-        blob = bucket.blob(f"{user_id}/.ignore")
-        blob.upload_from_string('', content_type='text/plain')
+            # create User folder on Storage
+            bucket = storage.bucket()
+            blob = bucket.blob(f"{user_id}/.ignore")
+            blob.upload_from_string('', content_type='text/plain')
 
-        return {'message': 'User successfully added',
-                'user_data': user_ref.get().to_dict(),
-                'storage_folder': blob.public_url
-                }, 201
+            return {'message': 'User successfully added',
+                    'user_data': user_ref.get().to_dict(),
+                    'storage_folder': blob.public_url
+                    }, 201
+        except e:
+            return {'message': e}
 
 
 class UserProfileResource(Resource):
