@@ -7,3 +7,7 @@
 
 /AppFE/gradle.properties
 
+backend/blueprints/detection/images/
+backend/blueprints/detection/train/
+
+*__pycache__/

@@ -1,11 +1,11 @@
 
 from ultralytics import YOLO
 import os
-from .autoannotate import Labeler
+from autoannotate import Labeler
 
 import numpy as np
 import supervision as sv
-
+import time
 
 class Model_YOLO():
     def __init__(self, model_file=None):
@@ -24,8 +24,20 @@ class Model_YOLO():
         output_folder = output_folder if output_folder else input_folder + '_labeled'
         data_yaml = os.path.join(output_folder, 'data.yaml')
         return data_yaml
+    
+    def train(self, data_yaml = None, save_dir='.'):
+        if data_yaml is None and self.data_yaml is None:
+            print("data_yaml not found, please provide one.")
+        elif data_yaml is None:
+            data_yaml = self.data_yaml
 
-    def train(self, classes: list, input_folder: str, output_folder: str = None, extension: str = '.jpeg',
+        self.model.train(data=data_yaml,
+                         epochs=100,
+                         optimizer='AdamW',
+                         imgsz=640,
+                         project=save_dir,
+                         exist_ok=True)
+    def annotate_train(self, classes: list, input_folder: str, output_folder: str = None, extension: str = '.jpeg',
               save_dir='.'):
         '''
             Train the model, when user click `train`, this will load the dataset, train, then produce a model, e.g. `yolov8s.pt`.
@@ -35,13 +47,8 @@ class Model_YOLO():
         '''
         self.classes = classes
         self.data_yaml = self._annotate_dataset(classes, input_folder, output_folder, extension)  # produce a dataset
-        #
-        self.model.train(data=self.data_yaml,
-                         epochs=100,
-                         optimizer='AdamW',
-                         imgsz=640,
-                         project=save_dir,
-                         exist_ok=True)
+    
+        self.train(data_yaml=self.data_yaml, save_dir=save_dir)
         print("call")
 
     def detect(self, input_source):

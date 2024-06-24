@@ -1,7 +1,7 @@
-from autodistill_grounding_dino import GroundingDINO
+from autodistill_detic import DETIC
 from autodistill.detection import CaptionOntology
 import argparse
-
+import os
 '''
 Usage:          python auoto-annotate.py    --classes ['banana','orange']\
                                             --input_folder path/to/images
@@ -27,11 +27,15 @@ class Labeler():
         if not input_folder:
             raise ValueError("input_folder is required")
 
+        if not os.path.exists(input_folder):
+            raise FileNotFoundError(f"input_folder not found: {input_folder}")
+        
+        if len(os.listdir(input_folder)) == 0:
+            raise ValueError(f"input_folder is empty: {input_folder}")
 
         description_label_map = dict(zip(classes, classes))
 
-        print("Loading SAM model...")
-        base_model = GroundingDINO(ontology=CaptionOntology(
+        base_model = DETIC(ontology=CaptionOntology(
             description_label_map
         ))
 
@@ -51,7 +55,7 @@ parser.add_argument('--extension', type=str, default='.jpeg', help="Extension of
 if __name__ == '__main__':
 
     args = parser.parse_args()
-    print(args)
+    # print(args)
 
     classes_str = args.classes
     classes = classes_str.strip()[1:-1].split(',')
