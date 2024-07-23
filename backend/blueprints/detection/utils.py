@@ -18,6 +18,8 @@ def draw_bbox(image, preds, classes, hide_conf=True, hide_labels=False):
             `preds`: in each line: x1, y1, x2, y2, class
     '''
 
+    if len(preds) == 0:
+        return image
     # print("\nCombining Image and Labels...")
     im0 = np.array(image)
     imgsz = im0.shape[:2] # h w

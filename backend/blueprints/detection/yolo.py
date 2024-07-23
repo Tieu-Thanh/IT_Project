@@ -36,7 +36,10 @@ class Model_YOLO():
                          optimizer='AdamW',
                          imgsz=640,
                          project=save_dir,
-                         exist_ok=True)
+                         exist_ok=True,
+                         batch = 8,
+                         amp=False # avoid nan loss when training with GPU, source https://stackoverflow.com/a/76201317
+                         )
     def annotate_train(self, classes: list, input_folder: str, output_folder: str = None, extension: str = '.jpeg',
               save_dir='.'):
         '''

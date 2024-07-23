@@ -1,5 +1,5 @@
 /venv/
-/images/
+images*
 /.vscode/
 /backend/.idea
 /backend/blueprints/detection/Images
@@ -11,3 +11,6 @@ backend/blueprints/detection/images/
 backend/blueprints/detection/train/
 
 *__pycache__/
+*tmp*   
+data*
+*.pth
